@@ -1,2 +1,9 @@
-class MarketData:
-  pass
+from abc import ABC, abstractmethod
+
+
+class MarketData(ABC):
+
+  @abstractmethod
+  def download_bars(self):
+    raise NotImplementedError('implement download_bars()')
+    
