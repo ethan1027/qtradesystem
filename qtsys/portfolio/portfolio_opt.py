@@ -1,5 +1,5 @@
 class PortfolioOpt:
   def __init__(
-    self,
-    
-  )
+    self
+  ):
+    pass

@@ -1,0 +1,17 @@
+tradier:
+  live:
+    url: https://api.tradier.com'
+    token: 
+  paper:
+    url: https://sandbox.tradier.com
+    token:
+iexcloud:
+  url:
+  token:
+alpaca:
+  live:
+    url:
+    token:
+  paper:
+    url:
+    token:
