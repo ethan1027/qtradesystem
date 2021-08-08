@@ -1,4 +1,4 @@
-class BasePorfolioOptimizer:
+class PortfolioOpt:
   def __init__(
     self,
     
