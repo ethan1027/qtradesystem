@@ -14,6 +14,7 @@ class Engine:
     portfolio_opt = EqualPorfolioOpt(),
     data_provider = YahooData()
   ):
+    self.interval = interval
     self.alpha_model = alpha_model
     self.universe_selector = universe_selector
     self.broker = broker

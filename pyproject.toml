@@ -12,6 +12,7 @@ pyEX = "^0.5.0"
 QuantStats = "^0.0.34"
 python-dotenv = "^0.19.0"
 pytest = "^6.2.4"
+pandas-market-calendars = "^2.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
