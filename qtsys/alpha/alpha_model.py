@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import List
+from qtsys.broker.broker import Position
+
 
 class AlphaModel(ABC):
-  def __init__(self):
-    pass
 
   @abstractmethod
-  def on_bar(self, data):
+  def on_bar(self, data, positions: List[Position], time):
     raise NotImplementedError('should implement on_bar()')
     
-  def run(self, data):
-    self.on_bar(data)

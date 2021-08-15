@@ -16,6 +16,8 @@ pandas-market-calendars = "^2.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
+flake8 = "^3.9.2"
+pylint = "^2.9.6"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
