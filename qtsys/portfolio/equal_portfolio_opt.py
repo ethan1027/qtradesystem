@@ -1,2 +1,2 @@
-class EqualPorfolioOpt():
+class EqualPortfolioOpt():
   pass

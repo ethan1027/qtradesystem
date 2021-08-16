@@ -1,10 +1,10 @@
 tradier:
   live:
     url: https://api.tradier.com'
-    token: 
+    token: x8d3sxOHfXigaEMumQXE4Yu2tACS
   paper:
     url: https://sandbox.tradier.com
-    token:
+    token: Q7A7WpXgM72XDeW5BKQnKDynUBXx 
 iexcloud:
   url:
   token:

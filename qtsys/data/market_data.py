@@ -5,8 +5,8 @@ class MarketData(ABC):
 
   @abstractmethod
   def download_bars(self):
-    raise NotImplementedError('implement download_bars()')
+    pass
   
-  # @abstractmethod
-  # def get_bars(cur_date: str, look_back_period):
-  #   pass
+  @abstractmethod
+  def get_historical_bars(self):
+    pass

@@ -2,15 +2,15 @@ from abc import ABC, abstractmethod
 
 class Broker(ABC):
   @abstractmethod
-  def get_balances():
-    raise NotImplementedError('should implement get_balance')
+  def get_balances(self):
+    pass
 
   @abstractmethod
-  def get_positions():
-    raise NotImplementedError('should implement get_positions')
+  def get_positions(self):
+    pass
 
   @abstractmethod
-  def get_orders():
+  def get_orders(self):
     pass
 
   @abstractmethod
