@@ -8,8 +8,8 @@ class TradierData(MarketData):
     '1d': 'daily'
   }
 
-  def __init__(self, client: TradierClient):
-    self.client = client
+  def __init__(self):
+    self.client = TradierClient()
 
   def download_bars(self, symbols, start=None, end=None, interval='1d'):
     params = {'symbol': symbols, 'interval': self.interval_dict[interval], 'start': start, 'end': end}
@@ -20,3 +20,4 @@ class TradierData(MarketData):
   
   def get_historical_bars(self, symbol, current_date):
     return self._historical_bars[:current_date][:-1]
+
