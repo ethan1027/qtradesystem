@@ -32,7 +32,7 @@ def run(
   interval=timedelta(hours=1),
   offset=timedelta(minutes=1),
   selection_interval=timedelta(days=1),
-  data_provider=YahooData()
+  market_data=YahooData()
 ):
   print('bootstrap schedule')
   schedule = _create_schedule()
