@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 
 class UniverseSelector(ABC):
   
   @abstractmethod
-  def on_selection(self, cur_date, data):
+  def on_selection(self, cur_date) -> List[str]:
     pass
 
-  def run(self, cur_date, data):
-    self.on_selection(cur_date, data)
