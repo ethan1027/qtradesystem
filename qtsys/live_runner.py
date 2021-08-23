@@ -29,16 +29,16 @@ def run(
   universe_selector: UniverseSelector,
   broker: Broker,
   portfolio_opt=EqualPortfolioOpt(),
-  interval=timedelta(hours=1),
-  offset=timedelta(minutes=1),
-  selection_interval=timedelta(days=1),
+  interval: timedelta = timedelta(hours=1),
+  offset: timedelta = timedelta(minutes=1),
+  selection_interval: timedelta = timedelta(days=1),
   market_data=YahooData()
 ):
   print('bootstrap schedule')
   schedule = _create_schedule()
   selection_date = None
   while True:
-    if _now() > schedule.index[-1]:
+    if _now().date() > schedule.index[-1]:
       print('updating schedule')
       schedule = _create_schedule()
     if _now() not in schedule.index:
@@ -56,5 +56,11 @@ def run(
 
       # TRADING
       today = _now().strftime('%Y-%m-%d')
-      next_trading_time = schedule[today]['market_open']
-      closing_time = schedule[today]['market_close']
+      next_trading_time = schedule[today]['market_open'].astimezone(ny_tz) + offset
+      closing_time = schedule[today]['market_close'].astimezone(ny_tz)
+      while _now() < closing_time:
+        if _now() >= next_trading_time:
+          print(_now(), 'trading time') 
+          next_trading_time += interval
+          time.sleep(interval.total_seconds() - 60)
+        time.sleep(1)

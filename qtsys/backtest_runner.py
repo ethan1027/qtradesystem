@@ -17,7 +17,7 @@ def run(
   offset=timedelta(minutes=1),
   selection_interval=timedelta(days=1),
   initial_capital=10000,
-  data_provider=YahooData()
+  trading_data=YahooData()
 ):
   broker = BacktestBroker(initial_capital, start_dt)
   print('input', start_dt, end_dt)
