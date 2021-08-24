@@ -31,7 +31,7 @@ class TradierClient:
   async def _async_get(self, session: ClientSession, uri, params):
     response = await session.get(self.url + uri, params=params, headers=self.headers)
     json = await response.json()
-    return { params['symbol']: json }
+    return (params['symbol'], json)
 
   @property
   def account_id(self):
