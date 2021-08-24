@@ -32,7 +32,8 @@ def run(
   interval: timedelta = timedelta(hours=1),
   offset: timedelta = timedelta(minutes=1),
   selection_interval: timedelta = timedelta(days=1),
-  market_data=YahooData()
+  market_data=YahooData(),
+
 ):
   print('bootstrap schedule')
   schedule = _create_schedule()
@@ -49,7 +50,7 @@ def run(
       if not selection_date or selection_date + selection_interval <= datetime.now().date():
         while _now().hour < 7:
           print(_now(), 'waiting for selection time. sleep for a minute')
-          time.sleep(60) 
+          time.sleep(60)
         print(_now(), 'selecting assets')
         selection_date = _now().date()
         selection = universe_selector.on_selection(selection_date.strftime('%Y-m-%d'))
@@ -58,9 +59,11 @@ def run(
       today = _now().strftime('%Y-%m-%d')
       next_trading_time = schedule[today]['market_open'].astimezone(ny_tz) + offset
       closing_time = schedule[today]['market_close'].astimezone(ny_tz)
-      while _now() < closing_time:
+      if _now() > next_trading_time:
+        next_trading_time += ((_now() - next_trading_time) // interval) * interval
+      while next_trading_time < closing_time:
         if _now() >= next_trading_time:
-          print(_now(), 'trading time') 
+          print(_now(), 'trading time')
           next_trading_time += interval
           time.sleep(interval.total_seconds() - 60)
         time.sleep(1)
