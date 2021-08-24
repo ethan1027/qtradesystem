@@ -27,7 +27,7 @@ class TradierData(MarketData):
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(self.client.async_get_all(loop, '/v1/markets/history', params_list))
     bars_dict = dict(results)
-    for symbol, bars in bars_dict: 
+    for symbol, bars in bars_dict.items(): 
       df = pd.json_normalize(bars['history']['day'])
       df.set_index('date', inplace=True)
       bars_dict[symbol] = df
