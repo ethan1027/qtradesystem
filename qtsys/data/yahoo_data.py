@@ -15,7 +15,7 @@ class YahooData(MarketData):
     }
     df.rename(columns=columns, inplace=True) # type: ignore
     df = df.rename_axis(index={'Date':'date'}) 
-    self._historical_bars = df
+    return df
 
   def get_historical_bars(self, symbol, current_date):
     return self._historical_bars[:current_date][:-1]

@@ -1,23 +1,24 @@
 import asyncio
-from re import split
+from qtsys.data.util import resample_bar_data
+
 from qtsys.client.tradier import TradierClient
 import pandas as pd
 from qtsys.data.market_data import MarketData
 
 
 class TradierData(MarketData):
-  interval_ref = {
+  interval_param = {
     '1d': 'daily',
     '1m': '1min',
     '5m': '5min',
     '15m': '15min',
-    '30m': '1min',
-    '1h': '1min'
+    '30m': '15min',
+    '1h': '15min'
   }
 
-  resample_factor = {
-    '30m': 2,
-    '1h': 4
+  resample_param = {
+    '30m': '30min',
+    '1h': '60min'
   }
 
   def __init__(self):
@@ -31,8 +32,8 @@ class TradierData(MarketData):
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():
         df = pd.json_normalize(bars['history']['day'])
-        df['date'] = pd.to_datetime(df['date']) # type: ignore
         df.set_index('date', inplace=True)
+        df.index = pd.to_datetime(df.index) # type: ignore
         bars_dict[symbol] = df
       return bars_dict
     else:
@@ -40,8 +41,10 @@ class TradierData(MarketData):
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():
         df = pd.json_normalize(bars['series']['data'])
-        df['date'] = pd.Timestamp(df['timestamp']) # type: ignore
-        df.set_index('date', inplace=True)
+        df.set_index('time', inplace=True)
+        df.index = pd.to_datetime(df.index) # type: ignore
+        if interval in self.resample_param.keys():
+          resample_bar_data(df, self.resample_param[interval])
         bars_dict[symbol] = df
       return bars_dict
    
@@ -52,5 +55,5 @@ class TradierData(MarketData):
     return self._historical_bars[symbol][:current_date][:-1]
 
   def _create_data_params(self, symbol, start, end, interval):
-    return {'symbol': symbol, 'interval': self.interval_ref[interval], 'start': start, 'end': end}
+    return {'symbol': symbol, 'interval': self.interval_param[interval], 'start': start, 'end': end}
 
