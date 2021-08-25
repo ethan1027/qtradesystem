@@ -44,7 +44,7 @@ class TradierData(MarketData):
         df.set_index('time', inplace=True)
         df.index = pd.to_datetime(df.index) # type: ignore
         if interval in self.resample_param.keys():
-          resample_bar_data(df, self.resample_param[interval])
+          df = resample_bar_data(df, self.resample_param[interval])
         bars_dict[symbol] = df
       return bars_dict
    
