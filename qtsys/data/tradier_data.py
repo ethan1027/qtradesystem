@@ -10,7 +10,7 @@ class TradierData(MarketData):
     '1d': 'daily',
     '1m': '1min',
     '5m': '5min',
-    '15m': '1min',
+    '15m': '15min',
     '30m': '1min',
     '1h': '1min'
   }
@@ -31,14 +31,16 @@ class TradierData(MarketData):
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():
         df = pd.json_normalize(bars['history']['day'])
+        df['date'] = pd.to_datetime(df['date']) # type: ignore
         df.set_index('date', inplace=True)
         bars_dict[symbol] = df
       return bars_dict
     else:
-      results = loop.run_until_complete(self.client.async_get_all(loop, 'v1/markets/timesales', params_list))
+      results = loop.run_until_complete(self.client.async_get_all(loop, '/v1/markets/timesales', params_list))
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():
-        df = pd.json_normalize(bars['history']['day'])
+        df = pd.json_normalize(bars['series']['data'])
+        df['date'] = pd.Timestamp(df['timestamp']) # type: ignore
         df.set_index('date', inplace=True)
         bars_dict[symbol] = df
       return bars_dict
