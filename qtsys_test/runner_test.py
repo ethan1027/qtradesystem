@@ -1,6 +1,7 @@
+from datetime import timedelta
 import pytest
 from qtsys import backtest_runner, live_runner
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_backtest_runner():
-  live_runner.run(None, None, None)
+  live_runner.run(None, None, None, interval=timedelta(minutes=3))

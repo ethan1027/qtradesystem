@@ -1,5 +1,7 @@
+import math
 import time
 import pytz
+import pandas as pd
 from datetime import datetime, timedelta, timezone
 from qtsys.broker.broker import Broker
 from qtsys.data.yahoo_data import YahooData
@@ -21,7 +23,6 @@ def _create_schedule():
   now_str = datetime.strftime(now, '%Y-%m-%d')
   one_month_later_str = datetime.strftime(one_month_later, '%Y-%m-%d')
   schedule = nyse.schedule(now_str, one_month_later_str)
-  print(schedule)
   return schedule
  
 def run(
@@ -39,10 +40,11 @@ def run(
   schedule = _create_schedule()
   selection_date = None
   while True:
-    if _now().date() > schedule.index[-1]:
+    today = pd.Timestamp(_now().date()) 
+    if today > schedule.index[-1]:
       print('updating schedule')
       schedule = _create_schedule()
-    if _now() not in schedule.index:
+    if today not in schedule.index:
       print(_now(), 'not a trading day. sleep for an hour...')
       time.sleep(3600)
     else:
@@ -53,17 +55,18 @@ def run(
           time.sleep(60)
         print(_now(), 'selecting assets')
         selection_date = _now().date()
-        selection = universe_selector.on_selection(selection_date.strftime('%Y-m-%d'))
+        # selection = universe_selector.on_selection(selection_date.strftime('%Y-m-%d'))
 
       # TRADING
       today = _now().strftime('%Y-%m-%d')
-      next_trading_time = schedule[today]['market_open'].astimezone(ny_tz) + offset
-      closing_time = schedule[today]['market_close'].astimezone(ny_tz)
+      next_trading_time = schedule.loc[today]['market_open'].astimezone(ny_tz) + offset
+      closing_time = schedule.loc[today]['market_close'].astimezone(ny_tz)
       if _now() > next_trading_time:
-        next_trading_time += ((_now() - next_trading_time) // interval) * interval
+        next_trading_time += math.ceil((_now() - next_trading_time) / interval) * interval
+      print('next trading time', next_trading_time)
       while next_trading_time < closing_time:
         if _now() >= next_trading_time:
-          print(_now(), 'trading time')
+          print(_now(), 'trading in action')
           next_trading_time += interval
           time.sleep(interval.total_seconds() - 60)
         time.sleep(1)
