@@ -1,7 +1,6 @@
-import math
-import time
+from time import time
+from apscheduler.schedulers.blocking import BlockingScheduler
 import pytz
-import pandas as pd
 from datetime import datetime, timedelta, timezone
 from qtsys.broker.broker import Broker
 from qtsys.data.yahoo_data import YahooData
@@ -13,17 +12,6 @@ from qtsys.portfolio.equal_portfolio_opt import EqualPortfolioOpt
 
 
 ny_tz = pytz.timezone('US/Eastern')
-        
-def _now(): return datetime.now().astimezone(ny_tz)
-
-def _create_schedule():
-  now = datetime.now()
-  nyse = mcal.get_calendar('NYSE')
-  one_month_later = now + timedelta(days=30)
-  now_str = datetime.strftime(now, '%Y-%m-%d')
-  one_month_later_str = datetime.strftime(one_month_later, '%Y-%m-%d')
-  schedule = nyse.schedule(now_str, one_month_later_str)
-  return schedule
  
 def run(
   alpha_model: AlphaModel,
@@ -36,4 +24,18 @@ def run(
   market_data=YahooData(),
 
 ):
-  pass
+  scheduler = BlockingScheduler()
+  scheduler.add_job(selecting, 'cron', day_of_week='mon-sun', hour=16, minute=49, timezone='US/Eastern')
+  scheduler.add_job(trading, 'interval', minutes=1, start_date='2021-08-28 13:25:00', timezone='US/Eastern')
+  print(scheduler.get_jobs())
+  scheduler.start()
+
+
+def trading(broker: Broker, data):
+  print(datetime.now(), 'trading job')
+  if broker.is_market_open():
+    pass
+  
+def selecting():
+  print(datetime.now(), 'selecting job')
+  

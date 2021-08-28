@@ -25,6 +25,10 @@ class Broker(ABC):
   def sell_short(self, symbol, quantity, type):
     pass
 
+  @abstractmethod
+  def is_market_open(self):
+    pass
+
 class Position:
   def __init__(self, symbol, cost_basis, date_acquired, quantity, tid):
     self.symbol = symbol
