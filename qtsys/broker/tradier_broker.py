@@ -9,3 +9,7 @@ class TradierBroker(Broker):
   def get_balances(self):
     balances = self.client.get(f'/v1/accounts/{self.client.account_id}/balances').json()
     return balances
+
+  def is_market_open(self):
+    json = self.client.get('/v1/markets/clock').json()
+    return json['clock']['state'] == 'open'

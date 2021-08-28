@@ -18,7 +18,7 @@ def test_yahoo_hourly_bars():
   assert hourly_bars is not None
 
 def test_tradier_hourly_bars():
-  hourly_bars = TradierData().download_bars('NVDA TSLA', start='2021-08-24 09:30', end='2021-08-24 16:00', interval='1h')
+  hourly_bars = TradierData().download_bars('NVDA TSLA', start='2021-08-25 09:30', end='2021-08-25 16:00', interval='1h')
   print(hourly_bars) 
   assert hourly_bars is not None
 
