@@ -4,7 +4,6 @@ import pandas as pd
 from qtsys.data.util import resample_bar_data
 from qtsys.client.tradier import TradierClient
 from qtsys.data.market_data import MarketData
-# from qtsys.client import arcticw 
 from qtsys.client import pystorew
 
 
@@ -43,11 +42,10 @@ class TradierData(MarketData):
           df = resample_bar_data(df, interval)
         bars_dict[symbol] = df
       return bars_dict
-   
+
   def save_bars(self, symbols: str, start=None, end=None, interval='60min'):
     bars_dict = self.download_bars(symbols, start, end, interval)
     for symbol, df in bars_dict.items():
-      # arcticw.write('tradier', interval, symbol, df)
       pystorew.write('tradier', interval, symbol, df)
 
 
