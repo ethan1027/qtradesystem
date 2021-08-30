@@ -4,7 +4,8 @@ import pandas as pd
 from qtsys.data.util import resample_bar_data
 from qtsys.client.tradier import TradierClient
 from qtsys.data.market_data import MarketData
-from qtsys.client import arctic_lib
+# from qtsys.client import arcticw 
+from qtsys.client import pystorew
 
 
 class TradierData(MarketData):
@@ -19,6 +20,7 @@ class TradierData(MarketData):
     self.client = TradierClient(trading_mode=False, account_type='live')
 
   def download_bars(self, symbols: str, start=None, end=None, interval='60min'):
+    interval = self._resample_interval[interval] if interval in self._resample_interval else interval
     params_list = [self._create_data_params(symbol, start, end, interval) for symbol in symbols.split(' ')]
     loop = asyncio.get_event_loop()
     if interval == 'daily':
@@ -37,7 +39,7 @@ class TradierData(MarketData):
         df = pd.json_normalize(bars['series']['data'])
         df.set_index('time', inplace=True)
         df.index = pd.to_datetime(df.index) # type: ignore
-        if interval not in self._api_interval:
+        if interval in self._resample_interval:
           df = resample_bar_data(df, interval)
         bars_dict[symbol] = df
       return bars_dict
@@ -45,7 +47,9 @@ class TradierData(MarketData):
   def save_bars(self, symbols: str, start=None, end=None, interval='60min'):
     bars_dict = self.download_bars(symbols, start, end, interval)
     for symbol, df in bars_dict.items():
-      arctic_lib.write('tradier', interval, symbol, df)
+      # arcticw.write('tradier', interval, symbol, df)
+      pystorew.write('tradier', interval, symbol, df)
+
 
   
   def get_historical_bars(self, symbol, current_date):
@@ -54,6 +58,3 @@ class TradierData(MarketData):
 
   def _create_data_params(self, symbol, start, end, interval):
     return {'symbol': symbol, 'interval': interval, 'start': start, 'end': end}
-
-  def _create 
-

@@ -15,7 +15,7 @@ pytest = "^6.2.4"
 pandas-market-calendars = "^2.0"
 aiohttp = "^3.7.4"
 APScheduler = "^3.7.0"
-arctic = {git = "https://github.com/manahl/arctic.git"}
+PyStore = "^0.1.22"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
