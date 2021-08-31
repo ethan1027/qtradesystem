@@ -46,7 +46,7 @@ class TradierData(MarketData):
   def save_bars(self, symbols: str, start=None, end=None, interval='60min'):
     bars_dict = self.download_bars(symbols, start, end, interval)
     for symbol, df in bars_dict.items():
-      pystorew.write('tradier', interval, symbol, df)
+      pystorew.write_bars('tradier', interval, symbol, df)
 
 
   
