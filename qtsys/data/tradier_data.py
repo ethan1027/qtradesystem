@@ -28,7 +28,7 @@ class TradierData(MarketData):
       for symbol, bars in bars_dict.items():
         df = pd.json_normalize(bars['history']['day'])
         df.set_index('date', inplace=True)
-        df.index = pd.to_datetime(df.index) # type: ignore
+        df.index = pd.to_datetime(df.index)
         bars_dict[symbol] = df
       return bars_dict
     else:
@@ -37,7 +37,7 @@ class TradierData(MarketData):
       for symbol, bars in bars_dict.items():
         df = pd.json_normalize(bars['series']['data'])
         df.set_index('time', inplace=True)
-        df.index = pd.to_datetime(df.index) # type: ignore
+        df.index = pd.to_datetime(df.index)
         if interval in self._resample_interval:
           df = resample_bar_data(df, interval)
         bars_dict[symbol] = df

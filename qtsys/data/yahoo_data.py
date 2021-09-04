@@ -13,7 +13,7 @@ class YahooData(MarketData):
       'Close': 'close', 
       'Volume': 'volume'
     }
-    df.rename(columns=columns, inplace=True) # type: ignore
+    df.rename(columns=columns, inplace=True)
     df = df.rename_axis(index={'Date':'date'}) 
     return df
 
