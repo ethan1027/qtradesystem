@@ -2,3 +2,4 @@
 research/**
 **/__pycache__
 config.yml
+.vscode/**

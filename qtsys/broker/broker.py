@@ -14,15 +14,15 @@ class Broker(ABC):
     pass
 
   @abstractmethod
-  def buy(self, symbol, quantity, type, limit_price: float = None, stop_price: float = None, tag=None):
+  def buy(self, symbol, quantity, order_type, limit, stop):
     pass
 
   @abstractmethod
-  def sell(self, symbol, quantity, type):
+  def sell(self, symbol, quantity, order_type, limit, stop):
     pass
   
   @abstractmethod
-  def sell_short(self, symbol, quantity, type):
+  def sell_short(self, symbol, quantity, order_type):
     pass
 
   @abstractmethod

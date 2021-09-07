@@ -26,6 +26,9 @@ def write_order(broker_id, df):
 def write_positions(broker_id, df):
   pass
 
+def write_balaneces(broker_id, df):
+  pass
+
 def _write_or_append(collection: ps.collection, item, df):
   if item not in collection.list_items():
     collection.write(item, df)

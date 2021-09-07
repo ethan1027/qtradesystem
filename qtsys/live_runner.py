@@ -20,28 +20,31 @@ def run(
   portfolio_opt = EqualPortfolioOpt(),
   interval: str = '1h',
   offset: int = 5,
-  selection_interval: str = 'mon-fri',
+  selection_day: str = 'mon-fri',
   market_data: str = 'tradier',
 ):
   '''
-  selection_interval: https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html?highlight=cron#expression-types
+    selection_interval: https://apscheduler.readthedocs.io/en/stable/modules/triggers/cron.html?highlight=cron#expression-types
   '''
   data_bundle = DataBundle()
   scheduler = BlockingScheduler()
   selector_params = (universe_selector, data_bundle)
-  scheduler.add_job(select_assets, 'cron', selector_params, day_of_week='mon-sun', hour=16, minute=49, timezone='US/Eastern')
-  trader_params = (alpha_model, broker, getattr(data_bundle, market_data), data_bundle)
-  scheduler.add_job(trade, 'interval', trader_params, minutes=1, start_date='2021-08-28 13:25:00', timezone='US/Eastern')
+  scheduler.add_job(
+    select_assets, 'cron', selector_params,
+    day_of_week=selection_day, hour=16, minute=49, timezone='US/Eastern')
+  trader_params = (alpha_model, broker, portfolio_opt, getattr(data_bundle, market_data), data_bundle)
+  scheduler.add_job(trade, 'interval', trader_params,
+    minutes=1, start_date=_start_time(), timezone='US/Eastern')
   print(scheduler.get_jobs())
   scheduler.start()
 
 
 def trade(
   alpha_model: AlphaModel,
-  broker: Broker, 
+  broker: Broker,
   portfolio_opt: PortfolioOpt,
   data: MarketData,
-  dataw: DataBundle
+  data_bundle: DataBundle
 ):
   print(datetime.now(), 'trading job')
   if broker.is_market_open():
@@ -52,5 +55,5 @@ def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle)
   selection = unviverse_selector.select(data_bundle)
   print(selection)
 
-
-  
+def _start_time():
+  return datetime.now().strftime('%Y-%m-%d 09:30:00')

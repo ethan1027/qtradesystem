@@ -15,13 +15,13 @@ class TradierClient:
       print('getting account profile...')
       profile = self.get('/v1/user/profile')
       print('using profile:', profile)
-      self._account_id = profile['profile']['account']
+      self.account_id = profile['profile']['account']['account_number']
 
   def get(self, uri, params=None):
     return requests.get(self.url + uri, params=params, headers=self.headers).json()
 
   def post(self, uri, data):
-    return requests.get(self.url + uri, data)
+    return requests.post(self.url + uri, data, headers=self.headers).json()
 
   async def async_get_all(self, loop, uri, params_list):
     async with ClientSession(loop=loop) as session:
@@ -32,15 +32,3 @@ class TradierClient:
     response = await session.get(self.url + uri, params=params, headers=self.headers)
     json = await response.json()
     return (params['symbol'], json)
-
-  @property
-  def account_id(self):
-    if not self._account_id:
-      raise RuntimeError('Unable to retrieve account_id')
-    return self._account_id
-
-  @account_id.setter
-  def account_id(self, v):
-    self._account_id = v
-
-    
