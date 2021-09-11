@@ -18,11 +18,11 @@ class BacktestBroker(Broker):
   def get_orders(self):
     pass
 
-  def buy(self, symbol, quantity, type):
+  def buy(self, symbol, quantity, order_type):
     pass
 
-  def sell(self, symbol, quantity, type):
+  def sell(self, symbol, quantity, order_type):
     pass
 
-  def sell_short(self, symbol, quantity, type):
+  def sell_short(self, symbol, quantity, order_type):
     pass

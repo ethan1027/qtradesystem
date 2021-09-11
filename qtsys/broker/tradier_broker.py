@@ -1,12 +1,13 @@
 import pandas as pd
+import time
 from qtsys.client.tradier import TradierClient
 from qtsys.broker.broker import Broker
-import qtsys.client.pystorew as ps
-
+from qtsys.data.market_data import MarketData
 
 class TradierBroker(Broker):
-  def __init__(self, account_type: str = 'paper'):
+  def __init__(self, account_type: str = 'paper', market_data: MarketData = None):
     self.client = TradierClient(trading_mode=True, account_type=account_type)
+    self.market_data = market_data
 
   def get_balances(self):
     balances = self.client.get(f'/v1/accounts/{self.client.account_id}/balances')
@@ -17,7 +18,7 @@ class TradierBroker(Broker):
 
   def get_positions(self):
     positions = self.client.get(f'/v1/accounts/{self.client.account_id}/positions')
-    df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
+    # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
     return positions
 
   def get_orders(self):
@@ -37,17 +38,22 @@ class TradierBroker(Broker):
       'tag': tag,
       'preview': 'true'
     }
-    preview = self.client.post(f'/v1/accounts/{self.client.account_id}/orders', data)
-    print('preview order:', preview)
-    if preview['order']['status'] == 'ok':
-    return
+    preview_status = None
+    while preview_status != 'ok':
+      preview = self.client.post(f'/v1/accounts/{self.client.account_id}/orders', data)
+      preview_status = preview['order']['status']
+      print('preview order:', preview)
+      time.sleep(2)
+    data['preview'] = False
+    return self.client.post(f'/v1/accounts/{self.client.account_id}/orders', data)
 
 
   def buy(self, symbol, quantity, order_type = 'market', limit = None, stop = None, tag = None):
     return self.place_order(symbol, 'buy', quantity, order_type, limit, stop, tag)
 
   def sell(self, symbol, quantity, order_type = 'market', limit = None, stop = None, tag = None):
-    return self.place_order(symbol, 'sell', quantity, order_type = 'market', limit = None, stop = None, tag = None)
+    order = self.place_order(symbol, 'sell', quantity, order_type, limit, stop, tag)
+
 
   def sell_short(self):
     pass
@@ -58,3 +64,6 @@ class TradierBroker(Broker):
   def is_market_open(self):
     json = self.client.get('/v1/markets/clock').json()
     return json['clock']['state'] == 'open'
+
+  def id(self):
+    return self.client.account_id

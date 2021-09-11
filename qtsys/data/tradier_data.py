@@ -48,11 +48,13 @@ class TradierData(MarketData):
     for symbol, df in bars_dict.items():
       pystorew.write_bars('tradier', interval, symbol, df)
 
+  def _create_data_params(self, symbol, start, end, interval):
+    return {'symbol': symbol, 'interval': interval, 'start': start, 'end': end }
 
-  
   def get_historical_bars(self, symbol, current_date):
     # return self._historical_bars[symbol][:current_date][:-1]
     pass
 
-  def _create_data_params(self, symbol, start, end, interval):
-    return {'symbol': symbol, 'interval': interval, 'start': start, 'end': end}
+  def get_quotes(self, symbols: str):
+    symbols = symbols.replace(' ', ',')
+    return self.client.get('/v1/markets/quotes', { symbols: symbols })['quotes']['quote']

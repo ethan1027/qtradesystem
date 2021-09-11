@@ -29,10 +29,6 @@ class Broker(ABC):
   def is_market_open(self):
     pass
 
-class Position:
-  def __init__(self, symbol, cost_basis, date_acquired, quantity, tid):
-    self.symbol = symbol
-    self.cost_basis = cost_basis
-    self.date_acquired = date_acquired
-    self.quantity = quantity
-    self.tid = tid
+  @abstractmethod
+  def id(self):
+    pass
