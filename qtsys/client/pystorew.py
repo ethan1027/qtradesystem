@@ -18,7 +18,7 @@ def write_selection(broker_id, df):
 
 def read_selection(broker_id, dt):
   c = store.collection(broker_id)
-  return c.item('selection').data[dt]
+  return c.item('selection').to_pandas().iloc[dt]
 
 def write_order(broker_id, df):
   pass
@@ -26,10 +26,10 @@ def write_order(broker_id, df):
 def write_positions(broker_id, df):
   pass
 
-def write_balaneces(broker_id, df):
+def write_balances(broker_id, df):
   pass
 
-def _write_or_append(collection: ps.collection, item, df):
+def _write_or_append(collection, item, df):
   if item not in collection.list_items():
     collection.write(item, df)
   else:

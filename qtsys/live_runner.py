@@ -26,12 +26,15 @@ def trade(
 ):
   print(datetime.now(), 'trading job')
   if broker.is_market_open():
-    symbols = pystorew.read_selection(broker.id(), date.today())
+    symbols = pystorew.read_selection(broker.acc_id(), date.today())
     data.get_quotes(symbols)
     if lookback_days > 0:
-      data.download_bars(symbols, interval)
+      start = date.today() - timedelta(days=lookback_days)
+      market_data = data.download_bars(symbols, str(start), str(date.today()), interval)
+    for symbol in symbols.split(' '):
+      print(symbol)
+
     
-  
 def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle):
   print(datetime.now(), 'selecting job')
   selection = unviverse_selector.select(data_bundle)

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 
 
 class MarketData(ABC):
@@ -12,5 +13,5 @@ class MarketData(ABC):
     pass
 
   @abstractmethod
-  def get_quotes(self, symbols):
+  def get_quotes(self, symbols) -> Dict[str, Dict]:
     pass

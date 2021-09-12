@@ -5,27 +5,28 @@ from qtsys.broker.broker import Broker
 from qtsys.data.market_data import MarketData
 
 class TradierBroker(Broker):
-  def __init__(self, account_type: str = 'paper', market_data: MarketData = None):
+  def __init__(self, account_type: str, market_data: MarketData):
+    super().__init__(market_data)
     self.client = TradierClient(trading_mode=True, account_type=account_type)
-    self.market_data = market_data
+    self.acc_id = self.client.account_id
 
   def get_balances(self):
-    balances = self.client.get(f'/v1/accounts/{self.client.account_id}/balances')
+    balances = self.client.get(f'/v1/accounts/{self.acc_id}/balances')
     total_equity = balances['balances']['total_equity']
     df = pd.DataFrame(data={'total_equity': [total_equity]}, index=[pd.Timestamp.now(tz='US/Eastern')])
     print(df)
     return total_equity
 
   def get_positions(self):
-    positions = self.client.get(f'/v1/accounts/{self.client.account_id}/positions')
+    positions = self.client.get(f'/v1/accounts/{self.acc_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
     return positions
 
   def get_orders(self):
-    orders = self.client.get(f'/v1/accounts/{self.client.account_id}/orders')
+    orders = self.client.get(f'/v1/accounts/{self.acc_id}/orders')
     return orders
 
-  def place_order(self, symbol, side, quantity, order_type = 'market', limit = None, stop = None, tag = None):
+  def place_order(self, symbol, side, quantity, order_type = 'market', limit = None, stop = None):
     data = {
       'class': 'equity',
       'symbol': symbol,
@@ -35,35 +36,37 @@ class TradierBroker(Broker):
       'duration': 'day',
       'limit': '{:.2f}'.format(limit) if limit else '',
       'stop': '{:.2f}'.format(stop) if stop else '',
-      'tag': tag,
       'preview': 'true'
     }
-    preview_status = None
-    while preview_status != 'ok':
-      preview = self.client.post(f'/v1/accounts/{self.client.account_id}/orders', data)
-      preview_status = preview['order']['status']
-      print('preview order:', preview)
-      time.sleep(2)
-    data['preview'] = False
-    return self.client.post(f'/v1/accounts/{self.client.account_id}/orders', data)
+    preview = self.client.post(f'/v1/accounts/{self.acc_id}/orders', data)
+    if preview['order']['status'] == 'ok':
+      data['preview'] = False
+      order = self.client.post(f'/v1/accounts/{self.acc_id}/orders', data)
+      print('placing order:', order)
+      order_status = None
+      while order_status not in ('filled', 'expired', 'canceled', 'rejected', 'error'):
+        time.sleep(1)
+        that_order = self.client.get(f'/v1/accounts/{self.acc_id}/orders/{order["order"]["id"]}')
+        order_status = that_order['order']['id']
+        print('confirming order:', that_order)
+        return that_order
+    else:
+      print('cannot proceed order:', preview)
 
 
-  def buy(self, symbol, quantity, order_type = 'market', limit = None, stop = None, tag = None):
-    return self.place_order(symbol, 'buy', quantity, order_type, limit, stop, tag)
+  def buy(self, symbol, quantity, order_type = 'market', limit = None, stop = None):
+    return self.place_order(symbol, 'buy', quantity, order_type, limit, stop)
 
-  def sell(self, symbol, quantity, order_type = 'market', limit = None, stop = None, tag = None):
-    order = self.place_order(symbol, 'sell', quantity, order_type, limit, stop, tag)
+  def sell(self, symbol, quantity, order_type = 'market', limit = None, stop = None):
+    order = self.place_order(symbol, 'sell', quantity, order_type, limit, stop)
 
 
   def sell_short(self):
     pass
 
-  def fulfill_orders(self):
+  def resolve_orders(self):
     pass
 
   def is_market_open(self):
     json = self.client.get('/v1/markets/clock').json()
     return json['clock']['state'] == 'open'
-
-  def id(self):
-    return self.client.account_id
