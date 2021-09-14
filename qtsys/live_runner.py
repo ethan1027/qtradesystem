@@ -32,7 +32,8 @@ def trade(
       start = date.today() - timedelta(days=lookback_days)
       historical_bars = data.download_bars(symbols, str(start), str(date.today()), interval)
     positions = broker.get_positions()
-    alpha_model.run_trades(symbols, quotes, historical_bars, positions)
+    symbols_to_order = alpha_model.run_trades(symbols, quotes, historical_bars, positions)
+    portfolio_target = portfolio_opt.optimize(symbols_to_order)
 
     
 def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle):

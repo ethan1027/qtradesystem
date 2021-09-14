@@ -1,5 +1,7 @@
+from abc import abstractmethod
+
+
 class PortfolioOpt:
-  def __init__(
-    self
-  ):
+  @abstractmethod
+  def optimize(self, symbols):
     pass
