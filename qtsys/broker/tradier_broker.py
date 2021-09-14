@@ -69,7 +69,7 @@ class TradierBroker(Broker):
     order = self.place_order(symbol, 'sell', quantity, order_type, limit, stop)
     gainloss = self.get_gain_loss(symbol)
     print(gainloss)
-    return
+    return order
 
 
   def buy_to_cover(self):
