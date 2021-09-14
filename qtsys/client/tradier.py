@@ -27,7 +27,7 @@ class TradierClient:
     async with ClientSession(loop=loop) as session:
       tasks = [asyncio.create_task(self._async_get(session, uri, params)) for params in params_list]
       return await asyncio.gather(*tasks)
-  
+
   async def _async_get(self, session: ClientSession, uri, params):
     response = await session.get(self.url + uri, params=params, headers=self.headers)
     json = await response.json()

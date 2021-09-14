@@ -26,13 +26,13 @@ def trade(
 ):
   print(datetime.now(), 'trading job')
   if broker.is_market_open():
-    symbols = pystorew.read_selection(broker.acc_id(), date.today())
-    data.get_quotes(symbols)
+    symbols = pystorew.read_selection(broker.get_account_id(), date.today())
+    quotes = data.get_quotes(symbols)
     if lookback_days > 0:
       start = date.today() - timedelta(days=lookback_days)
-      market_data = data.download_bars(symbols, str(start), str(date.today()), interval)
-    for symbol in symbols.split(' '):
-      print(symbol)
+      historical_bars = data.download_bars(symbols, str(start), str(date.today()), interval)
+    positions = broker.get_positions()
+    alpha_model.run_trades(symbols, quotes, historical_bars, positions)
 
     
 def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle):
@@ -40,8 +40,8 @@ def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle)
   selection = unviverse_selector.select(data_bundle)
   print(selection)
 
-def _start_time():
-  return datetime.now().strftime('%Y-%m-%d 09:30:00')
+def _get_start_datetime(start_time: str):
+  return datetime.now().strftime(f'%Y-%m-%d {start_time}:00')
 
 
 def run(
@@ -65,7 +65,7 @@ def run(
   scheduler.add_job(select_assets, 'cron', selector_params, day_of_week=selection_day, hour=16, minute=49, timezone='US/Eastern')
 
   trader_params = (alpha_model, broker, portfolio_opt, getattr(data_bundle, market_data), data_bundle, start_time, interval, lookback_days)
-  scheduler.add_job(trade, 'interval', trader_params, minutes=1, start_date=_start_time(), timezone='US/Eastern')
+  scheduler.add_job(trade, 'interval', trader_params, minutes=1, start_date=_get_start_datetime(start_time), timezone='US/Eastern')
 
   print(scheduler.get_jobs())
   scheduler.start()

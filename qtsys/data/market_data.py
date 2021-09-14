@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Dict
+import pandas as pd
 
 
 class MarketData(ABC):
 
   @abstractmethod
-  def download_bars(self, symbols, start, end, interval):
+  def download_bars(self, symbols, start, end, interval) -> Dict[str, pd.DataFrame]:
     pass
 
   @abstractmethod

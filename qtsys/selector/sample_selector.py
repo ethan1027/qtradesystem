@@ -6,8 +6,6 @@ import pyEX
 class SampleSelector(UniverseSelector):
   def select(self, data: DataBundle):
     token = data.iex.token
-    # c = pyEX.collectionsDF(tag='list', collectionName='mostactive', token=token)
-    # print(c)
     pyEX.largestTrades('TSLA', token=token)
 
     

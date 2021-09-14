@@ -1,2 +1,3 @@
 class EqualPortfolioOpt():
-  pass
+  def on_optimization(self, symbol):
+    pass

@@ -1,5 +1,5 @@
-import pandas as pd
 import time
+import pandas as pd
 from qtsys.client.tradier import TradierClient
 from qtsys.broker.broker import Broker
 from qtsys.data.market_data import MarketData
@@ -8,23 +8,31 @@ class TradierBroker(Broker):
   def __init__(self, account_type: str, market_data: MarketData):
     super().__init__(market_data)
     self.client = TradierClient(trading_mode=True, account_type=account_type)
-    self.acc_id = self.client.account_id
+    self.account_id = self.client.account_id
 
-  def get_balances(self):
-    balances = self.client.get(f'/v1/accounts/{self.acc_id}/balances')
+  def get_account_id(self) -> str:
+    return self.account_id
+
+  def get_balances(self) -> float:
+    balances = self.client.get(f'/v1/accounts/{self.account_id}/balances')
     total_equity = balances['balances']['total_equity']
     df = pd.DataFrame(data={'total_equity': [total_equity]}, index=[pd.Timestamp.now(tz='US/Eastern')])
     print(df)
     return total_equity
 
   def get_positions(self):
-    positions = self.client.get(f'/v1/accounts/{self.acc_id}/positions')
+    positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
-    return positions
+    return { position['symbol']: position for position in positions['positions']['position']}
 
   def get_orders(self):
-    orders = self.client.get(f'/v1/accounts/{self.acc_id}/orders')
+    orders = self.client.get(f'/v1/accounts/{self.account_id}/orders')
     return orders
+
+  def get_gain_loss(self, symbol: str):
+    params = { 'symbol': symbol }
+    gainloss = self.client.get(f'/v1/accounts/{self.account_id}/gainloss', params)
+    return gainloss['gainloss']['closed_position'][0]
 
   def place_order(self, symbol, side, quantity, order_type = 'market', limit = None, stop = None):
     data = {
@@ -38,15 +46,15 @@ class TradierBroker(Broker):
       'stop': '{:.2f}'.format(stop) if stop else '',
       'preview': 'true'
     }
-    preview = self.client.post(f'/v1/accounts/{self.acc_id}/orders', data)
+    preview = self.client.post(f'/v1/accounts/{self.account_id}/orders', data)
     if preview['order']['status'] == 'ok':
       data['preview'] = False
-      order = self.client.post(f'/v1/accounts/{self.acc_id}/orders', data)
+      order = self.client.post(f'/v1/accounts/{self.account_id}/orders', data)
       print('placing order:', order)
       order_status = None
       while order_status not in ('filled', 'expired', 'canceled', 'rejected', 'error'):
         time.sleep(1)
-        that_order = self.client.get(f'/v1/accounts/{self.acc_id}/orders/{order["order"]["id"]}')
+        that_order = self.client.get(f'/v1/accounts/{self.account_id}/orders/{order["order"]["id"]}')
         order_status = that_order['order']['id']
         print('confirming order:', that_order)
         return that_order
@@ -59,12 +67,15 @@ class TradierBroker(Broker):
 
   def sell(self, symbol, quantity, order_type = 'market', limit = None, stop = None):
     order = self.place_order(symbol, 'sell', quantity, order_type, limit, stop)
+    gainloss = self.get_gain_loss(symbol)
+    print(gainloss)
+    return
 
 
-  def sell_short(self):
+  def buy_to_cover(self):
     pass
 
-  def resolve_orders(self):
+  def sell_short(self):
     pass
 
   def is_market_open(self):

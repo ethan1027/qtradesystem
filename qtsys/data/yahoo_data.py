@@ -20,4 +20,7 @@ class YahooData(MarketData):
   def get_historical_bars(self, symbol, current_date):
     # return self._historical_bars[:current_date][:-1]
     pass
+
+  def get_quotes(self, symbol: str):
+    pass
   

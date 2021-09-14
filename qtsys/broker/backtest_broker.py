@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from qtsys.broker.broker import Broker
 
 
@@ -18,10 +17,10 @@ class BacktestBroker(Broker):
   def get_orders(self):
     pass
 
-  def buy(self, symbol, quantity, order_type):
+  def buy(self, symbol, quantity, order_type = 'market', limit = None, stop = None):
     pass
 
-  def sell(self, symbol, quantity, order_type):
+  def sell(self, symbol, quantity, order_type = 'market', limit = None, stop = None):
     pass
 
   def sell_short(self, symbol, quantity, order_type):
