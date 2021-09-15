@@ -21,21 +21,19 @@ def trade(
   data: MarketData,
   data_bundle: DataBundle,
   interval: str,
-  offset: int,
   lookback_days: int
 ):
   print(datetime.now(), 'trading job')
   if broker.is_market_open():
     symbols = pystorew.read_selection(broker.get_account_id(), date.today())
     quotes = data.get_quotes(symbols)
-    if lookback_days > 0:
-      start = date.today() - timedelta(days=lookback_days)
-      historical_bars = data.download_bars(symbols, str(start), str(date.today()), interval)
+    start = date.today() - timedelta(days=lookback_days)
+    historical_bars = data.download_bars(symbols, str(start), str(date.today()), interval)
     positions = broker.get_positions()
     symbols_to_order = alpha_model.run_trades(symbols, quotes, historical_bars, positions)
     portfolio_target = portfolio_opt.optimize(symbols_to_order)
+    broker.resolve_orders(portfolio_target)
 
-    
 def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle):
   print(datetime.now(), 'selecting job')
   selection = unviverse_selector.select(data_bundle)
@@ -70,6 +68,4 @@ def run(
 
   print(scheduler.get_jobs())
   scheduler.start()
-
-
 

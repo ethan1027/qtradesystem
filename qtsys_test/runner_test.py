@@ -1,6 +1,6 @@
 from datetime import timedelta
 import pytest
-from qtsys import backtest_runner, live_runner
+from qtsys import live_runner
 
 @pytest.mark.skip()
 def test_backtest_runner():

@@ -21,9 +21,9 @@ class TradierData(MarketData):
 
   def download_bars(self, symbols: str, start=None, end=None, interval='60min') -> Dict[str, pd.DataFrame]:
     interval = self._resample_interval[interval] if interval in self._resample_interval else interval
-    params_list = [self._create_data_params(symbol, start, end, interval) for symbol in symbols.split(' ')]
     loop = asyncio.get_event_loop()
     if interval == 'daily':
+      params_list = [self._create_data_params(symbol, start, end, interval) for symbol in symbols.split(' ')]
       results = loop.run_until_complete(self.client.async_get_all(loop, '/v1/markets/history', params_list))
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():
@@ -33,6 +33,7 @@ class TradierData(MarketData):
         bars_dict[symbol] = df
       return bars_dict
     else:
+      params_list = [self._create_data_params(symbol, f'{start} 09:30:00', f'{end} 16:00:00', interval) for symbol in symbols.split(' ')]
       results = loop.run_until_complete(self.client.async_get_all(loop, '/v1/markets/timesales', params_list))
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():

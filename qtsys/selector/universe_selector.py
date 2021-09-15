@@ -4,8 +4,7 @@ from typing import List
 
 
 class UniverseSelector(ABC):
-  
+
   @abstractmethod
   def select(self, data: DataBundle) -> List[str]:
     pass
-

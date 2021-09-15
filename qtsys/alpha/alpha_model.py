@@ -9,6 +9,10 @@ class AlphaModel(ABC):
     pass
 
   def run_trades(self, symbols: str, quotes: Dict[str, Dict], historical_bars: Dict[str, pd.DataFrame], positions) -> List[str]:
+    symbols_to_order = []
     for symbol in symbols.split(' '):
-      signal = self.trade(quotes[symbol], historical_bars[symbol], positions[symbol])
+      if self.trade(quotes[symbol], historical_bars[symbol], positions[symbol]):
+        symbols_to_order.append(symbol)
+    return symbols_to_order
+
     
