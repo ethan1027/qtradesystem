@@ -14,5 +14,3 @@ class AlphaModel(ABC):
       if self.trade(quotes[symbol], historical_bars[symbol], positions[symbol]):
         symbols_to_order.append(symbol)
     return symbols_to_order
-
-    

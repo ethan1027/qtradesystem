@@ -18,7 +18,10 @@ class TradierClient:
       self.account_id = profile['profile']['account']['account_number']
 
   def get(self, uri, params=None):
-    return requests.get(self.url + uri, params=params, headers=self.headers).json()
+    response = requests.get(self.url + uri, params=params, headers=self.headers)
+    print(response.status_code)
+    print(response.text)
+    return response.json()
 
   def post(self, uri, data):
     return requests.post(self.url + uri, data, headers=self.headers).json()

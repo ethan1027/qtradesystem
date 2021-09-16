@@ -59,8 +59,6 @@ class TradierData(MarketData):
 
   def get_quotes(self, symbols: str):
     symbols = symbols.replace(' ', ',')
-    quotes = self.client.get('/v1/markets/quotes', { symbols: symbols })['quotes']['quote']
-    quotes_dict = {}
-    for quote in quotes:
-      quotes_dict[quote['symbol']] = quote
-    return quotes_dict
+    print(symbols)
+    quotes = self.client.get('/v1/markets/quotes', { symbols: symbols })
+    return { quote['symbol']: quote for quote in quotes['quotes']['quote'] }

@@ -1,6 +1,6 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import pytz
-from datetime import datetime, date, timedelta, timezone
+from datetime import datetime, date, timedelta
 from qtsys.broker.broker import Broker
 
 from qtsys.alpha.alpha_model import AlphaModel
@@ -34,13 +34,13 @@ def trade(
     portfolio_target = portfolio_opt.optimize(symbols_to_order)
     broker.resolve_orders(portfolio_target)
 
-def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle):
+def select_assets(unviverse_selector: UniverseSelector, data_bundle: DataBundle = DataBundle()):
   print(datetime.now(), 'selecting job')
   selection = unviverse_selector.select(data_bundle)
   print(selection)
 
 def _get_start_datetime(start_time: str):
-  return datetime.now().strftime(f'%Y-%m-%d {start_time}:00')
+  return f'{date.today()} {start_time}:00'
 
 
 def run(

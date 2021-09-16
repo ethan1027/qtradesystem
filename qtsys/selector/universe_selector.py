@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from qtsys.data.data_bundle import DataBundle
 from typing import List
-
+from qtsys.data.data_bundle import DataBundle
 
 class UniverseSelector(ABC):
 
