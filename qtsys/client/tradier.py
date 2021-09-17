@@ -19,12 +19,15 @@ class TradierClient:
 
   def get(self, uri, params=None):
     response = requests.get(self.url + uri, params=params, headers=self.headers)
-    print(response.status_code)
-    print(response.text)
+    if response.status_code >= 400:
+      print(response.status_code, response.text)
     return response.json()
 
   def post(self, uri, data):
-    return requests.post(self.url + uri, data, headers=self.headers).json()
+    response = requests.post(self.url + uri, data, headers=self.headers).json()
+    if response.status_code >= 400:
+      print(response.status_code, response.text)
+    return response 
 
   async def async_get_all(self, loop, uri, params_list):
     async with ClientSession(loop=loop) as session:
