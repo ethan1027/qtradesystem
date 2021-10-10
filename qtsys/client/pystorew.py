@@ -1,3 +1,7 @@
+from datetime import date
+import symbol
+import pandas as pd
+from typing import List
 import pystore as ps
 
 ps.set_path('C:/Users/quane/GitProjects/pystoredata')
@@ -12,8 +16,11 @@ def read_bars(provider, interval, symbol):
   c = store.collection(f'{provider}.{interval}')
   return c.item(symbol).data
 
-def write_selection(broker_id, df):
+def write_selection(broker_id, symbols: List[str]):
   c = store.collection(broker_id)
+  dt = date.today() 
+  symbols_str = ' '.join(symbols)
+  df = pd.DataFrame(data={'selection': [symbols_str]}, index=[pd.Timestamp()])
   _write_or_append(c, 'selection', df)
 
 def read_selection(broker_id, dt):

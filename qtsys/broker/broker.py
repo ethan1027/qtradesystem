@@ -1,8 +1,6 @@
-from typing import Dict
+from typing import Dict, List, Literal, Tuple
 from abc import ABC, abstractmethod
 from collections import Counter
-from qtsys.util.order_resolver import OrderResolver
-
 
 from qtsys.data.market_data import MarketData
 
@@ -57,7 +55,7 @@ class Broker(ABC):
       position_target[symbol] = balance * percentage // quotes[symbol]['last']
     current_positions = self.get_positions()
     order_target = Counter(position_target) - Counter(current_positions)
-    order_resolver = OrderResolver()  
+    order_resolver = OrderResolver()
     for symbol, quantity in order_target.most_common():
       if quantity > 0:
         order_resolver.buy_orders.append((symbol, quantity))
@@ -74,3 +72,12 @@ class Broker(ABC):
       quotes = self.market_data.get_quotes(symbol)
       self.buy(symbol, quantity, 'limit', quotes[symbol]['bid'])
 
+
+class OrderResolver:
+  def __init__(self, sell_orders: List[Tuple[str, int]] = [], buy_orders: List[Tuple[str, int]] = []):
+    self.sell_orders = sell_orders
+    self.buy_orders = buy_orders
+
+
+OrderType = Literal['buy', 'sell', 'sell_short', 'buy_cover', 'none']
+AccountType = Literal['live', 'paper']

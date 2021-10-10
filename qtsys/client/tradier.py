@@ -2,11 +2,12 @@ import asyncio
 from aiohttp import ClientSession
 import requests
 from qtsys.global_config import global_config
+from qtsys.broker.broker import AccountType
 
 
 
 class TradierClient:
-  def __init__(self, trading_mode: bool = False, account_type: str = 'paper'):
+  def __init__(self, trading_mode: bool = False, account_type: AccountType = 'paper'):
     self.url = global_config['tradier'][account_type]['url']
     self.token = global_config['tradier'][account_type]['token']
     self.headers = {'Authorization': f'Bearer {self.token}', 'Accept': 'application/json'}
@@ -38,3 +39,4 @@ class TradierClient:
     response = await session.get(self.url + uri, params=params, headers=self.headers)
     json = await response.json()
     return (params['symbol'], json)
+

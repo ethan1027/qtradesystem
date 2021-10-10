@@ -1,6 +1,7 @@
 import asyncio
 from typing import Dict
 import pandas as pd
+from qtsys.broker.broker import AccountType
 
 from qtsys.data.util import resample_bar_data
 from qtsys.client.tradier import TradierClient
@@ -16,8 +17,8 @@ class TradierData(MarketData):
     '60min': '15min',
   }
 
-  def __init__(self):
-    self.client = TradierClient(trading_mode=False, account_type='live')
+  def __init__(self, account_type: AccountType):
+    self.client = TradierClient(trading_mode=False, account_type=account_type)
 
   def download_bars(self, symbols: str, start=None, end=None, interval='60min') -> Dict[str, pd.DataFrame]:
     interval = self._resample_interval[interval] if interval in self._resample_interval else interval

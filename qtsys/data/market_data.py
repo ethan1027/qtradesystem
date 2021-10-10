@@ -16,3 +16,4 @@ class MarketData(ABC):
   @abstractmethod
   def get_quotes(self, symbols) -> Dict[str, Dict]:
     pass
+

@@ -1,11 +1,11 @@
-import time
+from collections import defaultdict
 import pandas as pd
 from qtsys.client.tradier import TradierClient
-from qtsys.broker.broker import Broker
+from qtsys.broker.broker import AccountType, Broker
 from qtsys.data.market_data import MarketData
 
 class TradierBroker(Broker):
-  def __init__(self, account_type: str, market_data: MarketData):
+  def __init__(self, account_type: AccountType, market_data: MarketData):
     super().__init__(market_data)
     self.client = TradierClient(trading_mode=True, account_type=account_type)
     self.account_id = self.client.account_id
@@ -23,7 +23,7 @@ class TradierBroker(Broker):
   def get_positions(self):
     positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
-    return { position['symbol']: position for position in positions['positions']['position']}
+    return defaultdict(int, { position['symbol']: position for position in positions['positions']['position']})
 
   def get_orders(self):
     orders = self.client.get(f'/v1/accounts/{self.account_id}/orders')
@@ -44,23 +44,10 @@ class TradierBroker(Broker):
       'duration': 'day',
       'limit': '{:.2f}'.format(limit) if limit else '',
       'stop': '{:.2f}'.format(stop) if stop else '',
-      'preview': 'true'
     }
-    preview = self.client.post(f'/v1/accounts/{self.account_id}/orders', data)
-    if preview['order']['status'] == 'ok':
-      data['preview'] = False
-      order = self.client.post(f'/v1/accounts/{self.account_id}/orders', data)
-      print('placing order:', order)
-      order_status = None
-      while order_status not in ('filled', 'expired', 'canceled', 'rejected', 'error'):
-        time.sleep(1)
-        that_order = self.client.get(f'/v1/accounts/{self.account_id}/orders/{order["order"]["id"]}')
-        order_status = that_order['order']['id']
-        print('confirming order:', that_order)
-        return that_order
-    else:
-      print('cannot proceed order:', preview)
-
+    order = self.client.post(f'/v1/accounts/{self.account_id}/orders', data)
+    print('placing order:', order)
+    return order
 
   def buy(self, symbol, quantity, order_type = 'market', limit = None, stop = None):
     return self.place_order(symbol, 'buy', quantity, order_type, limit, stop)

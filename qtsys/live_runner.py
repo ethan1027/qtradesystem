@@ -63,9 +63,10 @@ def run(
   selector_params = (universe_selector, data_bundle)
   scheduler.add_job(select_assets, 'cron', selector_params, day_of_week=selection_day, hour=16, minute=49, timezone='US/Eastern')
 
-  trader_params = (alpha_model, broker, portfolio_opt, getattr(data_bundle, market_data), data_bundle, start_time, interval, lookback_days)
+  trader_params = (alpha_model, broker, portfolio_opt,
+    getattr(data_bundle, market_data),
+    data_bundle, start_time, interval, lookback_days)
   scheduler.add_job(trade, 'interval', trader_params, minutes=1, start_date=_get_start_datetime(start_time), timezone='US/Eastern')
 
   print(scheduler.get_jobs())
   scheduler.start()
-
