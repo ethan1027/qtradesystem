@@ -1,4 +1,5 @@
 from qtsys.broker.tradier_broker import TradierBroker
+from qtsys.data.tradier_data import TradierData
 
 def test_backtest_broker():
   # BacktestBroker()
@@ -6,7 +7,5 @@ def test_backtest_broker():
 
 
 def test_tradier_broker():
-  broker = TradierBroker(account_type='live')
+  broker = TradierBroker(account_type='live', market_data=TradierData(account_type='live'))
   print(broker.get_balances())
-  print(broker.buy('AAPL', 1))
-  

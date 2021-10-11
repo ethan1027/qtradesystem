@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 import pandas as pd
-from qtsys.broker.broker import OrderType
+from qtsys.broker.broker import SideOfOrder
+from qtsys.broker.order_resolver import Order, OrderResolver
 
 class AlphaModel(ABC):
 
@@ -10,11 +11,11 @@ class AlphaModel(ABC):
     returns OrderType
   '''
   @abstractmethod
-  def trade(self, quote, historical_bars, position: int) -> OrderType:
+  def trade(self, quote, historical_bars, position: int) -> SideOfOrder:
     pass
 
-  def run_trades(self, symbols: str, quotes: Dict[str, Dict], historical_bars: Dict[str, pd.DataFrame], positions) -> Dict[str,OrderType]:
-    symbols_to_order = {}
+  def run_trades(self, symbols: str, quotes: Dict[str, Dict], historical_bars: Dict[str, pd.DataFrame], positions, order_resolver: OrderResolver) -> None:
     for symbol in symbols.split(' '):
-        symbols_to_order[symbol] = self.trade(quotes[symbol], historical_bars[symbol], positions[symbol])
-    return symbols_to_order
+      position = positions[symbol]
+      side_of_order = self.trade(quotes[symbol], historical_bars[symbol], position)
+      )
