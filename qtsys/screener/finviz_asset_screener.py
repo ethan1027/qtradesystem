@@ -1,9 +1,9 @@
 from finviz import Screener
 from qtsys.data.data_bundle import DataBundle
-from qtsys.selector.universe_selector import UniverseSelector
+from qtsys.screener.asset_screener import AssetScreener
 
 
-class SampleSelector(UniverseSelector):
+class FinvizAssetScreener(AssetScreener):
   def select(self, data: DataBundle):
     filters = ['fa_epsyoy_pos', 'geo_usa', 'sh_avgvol_o1000', 'sh_curvol_o1000', 'ta_changeopen_u1' , 'ta_sma200_pa']
     results = Screener(filters=filters, order='-volume')

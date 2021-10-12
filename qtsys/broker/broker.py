@@ -1,6 +1,5 @@
-from typing import DefaultDict, Dict, Literal
+from typing import DefaultDict, Literal
 from abc import ABC, abstractmethod
-from collections import Counter
 
 from qtsys.data.market_data import MarketData
 
@@ -15,7 +14,7 @@ AccountType = Literal['live', 'paper']
 class Broker(ABC):
   def __init__(self, market_data: MarketData, account_type: AccountType):
     self.market_data = market_data
-    self.account_type = account_type
+    self.account_type: AccountType = account_type
 
   @abstractmethod
   def get_account_id(self) -> str:
@@ -31,6 +30,10 @@ class Broker(ABC):
 
   @abstractmethod
   def is_market_open(self):
+    pass
+
+  @abstractmethod
+  def place_order(self, symbol, side: SideOfOrder, quantity, order_type: OrderType, limit, stop):
     pass
 
   # def resolve_orders_quantity(self, portfolio_target: Dict[str, float]) -> None:
@@ -57,4 +60,3 @@ class Broker(ABC):
   #   for symbol, quantity in order_resolver.buy_orders:
   #     quotes = self.market_data.get_quotes(symbol)
   #     self.buy(symbol, quantity)
-

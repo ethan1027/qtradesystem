@@ -1,17 +1,17 @@
 from datetime import date, timedelta
 import pandas_market_calendars as mcal
-from qtsys.selector.universe_selector import UniverseSelector
+from qtsys.selector.asset_selector import AssetSelector
 from qtsys.alpha.alpha_model import AlphaModel
 from qtsys.broker.backtest_broker import BacktestBroker
-from qtsys.portfolio.equal_portfolio_opt import EqualPortfolioOpt
+from qtsys.sizer.equal_position_sizer import EqualPositionSizer
 from qtsys.data.yahoo_data import YahooData
 
 
 def run(
   start_dt: str,
   alpha_model: AlphaModel,
-  universe_selector: UniverseSelector,
-  portfolio_opt=EqualPortfolioOpt(),
+  universe_selector: AssetSelector,
+  portfolio_opt=EqualPositionSizer(),
   end_dt=date.today().strftime("%Y-%m-%d"),
   interval=timedelta(minutes=30),
   offset=timedelta(minutes=1),
