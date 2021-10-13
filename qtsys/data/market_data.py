@@ -2,22 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Dict
 import pandas as pd
 
-
-class MarketData(ABC):
-
-  @abstractmethod
-  def download_bars(self, symbols, start, end, interval) -> Dict[str, pd.DataFrame]:
-    pass
-
-  @abstractmethod
-  def get_historical_bars(self, symbols, current_date):
-    pass
-
-  @abstractmethod
-  def get_quotes(self, symbols) -> Dict[str, Dict]:
-    pass
-
-
 class Quote:
   def __init__(self, quote):
     self.symbol: str = quote.get('symbol')
@@ -34,3 +18,20 @@ class Quote:
     self.ask_size: int = quote.get('ask_size')
     self.week_52_high: float = quote.get('week_52_high')
     self.week_52_low: float = quote.get('week_52_low')
+
+
+class MarketData(ABC):
+
+  @abstractmethod
+  def download_bars(self, symbols, start, end, interval) -> Dict[str, pd.DataFrame]:
+    pass
+
+  @abstractmethod
+  def get_historical_bars(self, symbols, current_date):
+    pass
+
+  @abstractmethod
+  def get_quotes(self, symbols) -> Dict[str, Quote]:
+    pass
+
+

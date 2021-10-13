@@ -36,15 +36,20 @@ def trade(
     quotes = data.get_quotes(symbols)
     start = date.today() - timedelta(days=lookback_days)
     historical_bars = data.download_bars(symbols, str(start), str(date.today()), interval)
-    new_orders = alpha_model.run_trades(symbols, quotes, historical_bars, positions, order_resolver)
+    new_orders = alpha_model.run_trades(symbols, quotes, historical_bars, positions)
     order_resolver.append_and_sort_orders(new_orders)
   
     # SIZE POSITIONS
-    position_sizer.run_sizing(positions, quotes)
+    opening_orders = order_resolver.get_opening_orders()
+    desired_positions = position_sizer.run_sizing(opening_orders)
+    order_resolver.quantify_opening_orders(desired_positions, positions, quotes)
 
-def select_assets(unviverse_selector: AssetScreener, broker: Broker, data_bundle: DataBundle):
+    # PLACE ORDERS
+    order_resolver.place_orders(broker)
+
+def select_assets(asset_screener: AssetScreener, broker: Broker, data_bundle: DataBundle):
   print(datetime.now(), 'selecting job')
-  selection = unviverse_selector.run_screen(data_bundle, broker.get_account_id())
+  selection = asset_screener.run_screen(data_bundle, broker.get_account_id())
   print(selection)
 
 def _get_start_datetime(start_time: str):
