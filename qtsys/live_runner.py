@@ -42,7 +42,7 @@ def trade(
     # SIZE POSITIONS
     opening_orders = order_resolver.get_opening_orders()
     desired_positions = position_sizer.run_sizing(opening_orders)
-    order_resolver.quantify_opening_orders(desired_positions, positions, quotes)
+    order_resolver.quantify_opening_orders(desired_positions, positions, quotes, broker.get_balances())
 
     # PLACE ORDERS
     order_resolver.place_orders(broker)
