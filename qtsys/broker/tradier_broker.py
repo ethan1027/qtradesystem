@@ -13,13 +13,16 @@ class TradierBroker(Broker):
   def get_account_id(self) -> str:
     return self.account_id
 
-  def get_balance(self) -> float:
-    balances = self.client.get(f'/v1/accounts/{self.account_id}/balances')
+  def get_balance(self, account_type: AccountType) -> float:
+    balances = self.client.get(f'/v1/accounts/{self.account_id}/balances')['balances']
     print(balances)
-    total_equity = balances['balances']['total_equity']
-    df = pd.DataFrame(data={'total_equity': [total_equity]}, index=[pd.Timestamp.now(tz='US/Eastern')])
+    if account_type == 'margin':
+      balance = balances['pdt']['stock_buying_power'] + balances['stock_long_value']
+    else:
+      balance = balances['total_equity']
+    df = pd.DataFrame(data={'total_equity': [balance]}, index=[pd.Timestamp.now(tz='US/Eastern')])
     print(df)
-    return total_equity
+    return balance
 
   def get_positions(self):
     positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
