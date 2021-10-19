@@ -13,7 +13,7 @@ class TradierBroker(Broker):
   def get_account_id(self) -> str:
     return self.account_id
 
-  def get_balances(self) -> float:
+  def get_balance(self) -> float:
     balances = self.client.get(f'/v1/accounts/{self.account_id}/balances')
     print(balances)
     total_equity = balances['balances']['total_equity']

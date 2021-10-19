@@ -8,4 +8,4 @@ def test_backtest_broker():
 
 def test_tradier_broker():
   broker = TradierBroker(account_type='live', market_data=TradierData(account_type='live'))
-  print(broker.get_balances())
+  print(broker.get_balance())
