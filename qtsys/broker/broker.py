@@ -13,16 +13,17 @@ BalanceType = Literal['cash', 'margin', 'day_margin']
   Abstract Broker for both backtest and live
 '''
 class Broker(ABC):
-  def __init__(self, market_data: MarketData, account_type: AccountType):
+  def __init__(self, market_data: MarketData, account_type: AccountType, balance_type: BalanceType):
     self.market_data = market_data
     self.account_type: AccountType = account_type
+    self.balance_type: BalanceType = balance_type
 
   @abstractmethod
   def get_account_id(self) -> str:
     pass
 
   @abstractmethod
-  def get_balance(self, balance_type) -> float:
+  def get_balance(self) -> float:
     pass
 
   @abstractmethod

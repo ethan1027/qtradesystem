@@ -1,22 +1,22 @@
 from collections import defaultdict
 import pandas as pd
 from qtsys.client.tradier import TradierClient
-from qtsys.broker.broker import AccountType, Broker, OrderType, SideOfOrder
+from qtsys.broker.broker import AccountType, BalanceType, Broker, OrderType, SideOfOrder
 from qtsys.data.market_data import MarketData
 
 class TradierBroker(Broker):
-  def __init__(self, account_type: AccountType, market_data: MarketData):
-    super().__init__(market_data, account_type)
+  def __init__(self, account_type: AccountType, balance_type: BalanceType, market_data: MarketData):
+    super().__init__(market_data, account_type, balance_type)
     self.client = TradierClient(trading_mode=True, account_type=account_type)
     self.account_id = self.client.account_id
 
   def get_account_id(self) -> str:
     return self.account_id
 
-  def get_balance(self, account_type: AccountType) -> float:
+  def get_balance(self) -> float:
     balances = self.client.get(f'/v1/accounts/{self.account_id}/balances')['balances']
     print(balances)
-    if account_type == 'margin':
+    if self.balance_type == 'margin':
       balance = balances['pdt']['stock_buying_power'] + balances['stock_long_value']
     else:
       balance = balances['total_equity']
