@@ -1,5 +1,7 @@
 from collections import defaultdict
+from typing import DefaultDict
 import pandas as pd
+from qtsys.broker.position import Position
 from qtsys.client.tradier import TradierClient
 from qtsys.broker.broker import AccountType, BalanceType, Broker, OrderType, SideOfOrder
 from qtsys.data.market_data import MarketData
@@ -24,10 +26,10 @@ class TradierBroker(Broker):
     print(df)
     return balance
 
-  def get_positions(self):
+  def get_positions(self) -> DefaultDict[str, Position]:
     positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
-    return defaultdict(int, { position['symbol']: int(position['quantity']) for position in positions['positions']['position'] })
+    return defaultdict(lambda: Position(None, 0, None), { position['symbol']: Position.from_tradier_position(position) for position in positions['positions']['position'] })
 
   def get_orders(self):
     orders = self.client.get(f'/v1/accounts/{self.account_id}/orders')
