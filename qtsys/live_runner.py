@@ -24,7 +24,8 @@ def trade(
   lookback_days: int
 ):
   print(datetime.now(), 'trading job')
-  if broker.is_market_open():
+  if True:
+  # if broker.is_market_open():
     order_resolver = OrderResolver()
     positions = broker.get_positions()
 
@@ -38,7 +39,7 @@ def trade(
     historical_bars = data.download_bars(symbols, str(start), str(date.today()), interval)
     new_orders = alpha_model.run_trades(symbols, quotes, historical_bars, positions)
     order_resolver.append_and_sort_orders(new_orders)
-  
+
     # SIZE POSITIONS
     opening_orders = order_resolver.get_opening_orders()
     desired_positions = position_sizer.run_sizing(opening_orders)
@@ -60,7 +61,7 @@ def run(
   alpha_model: AlphaModel,
   asset_screener: AssetScreener,
   broker: Broker,
-  portfolio_opt = EqualPositionSizer(),
+  position_sizer: PositionSizer = EqualPositionSizer(),
   interval: str = '1h',
   start_time: str = '09:30',
   lookback_days: int = 0,
@@ -76,9 +77,7 @@ def run(
   selector_params = (asset_screener, data_bundle, broker)
   scheduler.add_job(select_assets, 'cron', selector_params, day_of_week=selection_day, hour=16, minute=49, timezone='US/Eastern')
 
-  trader_params = (alpha_model, broker, portfolio_opt,
-    getattr(data_bundle, market_data),
-    data_bundle, start_time, interval, lookback_days)
+  trader_params = (alpha_model, broker, position_sizer, getattr(data_bundle, market_data), interval, lookback_days)
   scheduler.add_job(trade, 'interval', trader_params, minutes=1, start_date=_get_start_datetime(start_time), timezone='US/Eastern')
 
   print(scheduler.get_jobs())

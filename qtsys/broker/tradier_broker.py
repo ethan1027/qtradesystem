@@ -20,14 +20,14 @@ class TradierBroker(Broker):
       balance = balances['pdt']['stock_buying_power'] + balances['stock_long_value']
     else:
       balance = balances['total_equity']
-    df = pd.DataFrame(data={'total_equity': [balance]}, index=[pd.Timestamp.now(tz='US/Eastern')])
+    df = pd.DataFrame(data={'balance': [balance]}, index=[pd.Timestamp.now(tz='US/Eastern')])
     print(df)
     return balance
 
   def get_positions(self):
     positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
-    return defaultdict(int, { position['symbol']: position for position in positions['positions']['position']})
+    return defaultdict(int, { position['symbol']: int(position['quantity']) for position in positions['positions']['position'] })
 
   def get_orders(self):
     orders = self.client.get(f'/v1/accounts/{self.account_id}/orders')
