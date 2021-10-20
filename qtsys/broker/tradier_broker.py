@@ -29,7 +29,7 @@ class TradierBroker(Broker):
   def get_positions(self) -> DefaultDict[str, Position]:
     positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
-    return defaultdict(lambda: Position(None, 0, None), { position['symbol']: Position.from_tradier_position(position) for position in positions['positions']['position'] })
+    return defaultdict(Position, { position['symbol']: Position.from_tradier_position(position) for position in positions['positions']['position'] })
 
   def get_orders(self):
     orders = self.client.get(f'/v1/accounts/{self.account_id}/orders')

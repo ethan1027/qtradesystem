@@ -2,6 +2,7 @@ import asyncio
 from typing import Dict
 import pandas as pd
 from qtsys.broker.broker import AccountType
+from qtsys.data.quote import Quote
 
 from qtsys.data.util import resample_bar_data
 from qtsys.client.tradier import TradierClient
@@ -58,8 +59,8 @@ class TradierData(MarketData):
     # return self._historical_bars[symbol][:current_date][:-1]
     pass
 
-  def get_quotes(self, symbols: str):
+  def get_quotes(self, symbols: str) -> Dict[str,Quote]:
     symbols = symbols.replace(' ', ',')
     print(symbols)
     quotes = self.client.get('/v1/markets/quotes', { 'symbols': symbols })
-    return { quote['symbol']: quote for quote in quotes['quotes']['quote'] }
+    return { quote['symbol']: Quote.from_tradier_quote(quote) for quote in quotes['quotes']['quote'] }

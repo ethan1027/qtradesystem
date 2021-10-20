@@ -1,5 +1,5 @@
 class Position:
-  def __init__(self, cost_basis, quantity, symbol):
+  def __init__(self, cost_basis = 0, quantity = 0, symbol = ''):
     self.cost_basis: float = cost_basis
     self.quantity: int = quantity
     self.symbol: str = symbol
