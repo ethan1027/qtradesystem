@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Dict
 import pandas as pd
 from qtsys.broker.broker import AccountType
@@ -61,6 +62,7 @@ class TradierData(MarketData):
 
   def get_quotes(self, symbols: str) -> Dict[str,Quote]:
     symbols = symbols.replace(' ', ',')
-    print(symbols)
+    logging.info('downloading quotes for: %s', symbols)
     quotes = self.client.get('/v1/markets/quotes', { 'symbols': symbols })
+    logging.info(quotes)
     return { quote['symbol']: Quote.from_tradier_quote(quote) for quote in quotes['quotes']['quote'] }

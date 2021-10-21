@@ -1,4 +1,5 @@
 from typing import DefaultDict, Dict, List
+import logging
 
 from qtsys.broker.broker import Broker
 from qtsys.broker.order import Order
@@ -15,6 +16,7 @@ class OrderResolver:
     for symbol, position in positions.items():
       quantity = position.quantity
       if symbol not in selected_assets:
+        logging.info('closing position %s %s', quantity, symbol)
         if quantity > 0:
           self.orders.append(Order(symbol, 'sell', quantity))
         elif quantity < 0:

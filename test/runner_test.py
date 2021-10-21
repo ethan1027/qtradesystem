@@ -7,4 +7,4 @@ def test_backtest_runner():
   live_runner.run(None, None, None, interval=timedelta(minutes=3))
 
 def test_start_time():
-  print(live_runner._get_start_datetime())
+  print(live_runner.get_start_datetime())

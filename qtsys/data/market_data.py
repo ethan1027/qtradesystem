@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Dict
 import pandas as pd
 
+from qtsys.data.quote import Quote
+
 
 
 

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from aiohttp import ClientSession
 import requests
 from qtsys.global_config import global_config
@@ -11,12 +12,17 @@ class TradierClient:
     self.url = global_config['tradier'][account_type]['url']
     self.token = global_config['tradier'][account_type]['token']
     self.headers = {'Authorization': f'Bearer {self.token}', 'Accept': 'application/json'}
-    print('using endpoint', self.url)
+    logging.info('using endpoint %s', self.url)
     if trading_mode:
-      print('getting account profile...')
+      logging.info('fetching account profile')
       profile = self.get('/v1/user/profile')
-      print('using profile:', profile)
-      self.account_id = profile['profile']['account']['account_number']
+      account_number = profile['profile']['account']['account_number']
+      status = profile['profile']['account']['status']
+      type = profile['profile']['account']['type']
+      logging.info('account number: %s', account_number)
+      logging.info('account status: %s', status)
+      logging.info('account type: %s', type)
+      self.account_id = account_number
 
   def get(self, uri, params=None):
     response = requests.get(self.url + uri, params=params, headers=self.headers)
