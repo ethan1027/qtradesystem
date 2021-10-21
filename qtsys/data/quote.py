@@ -1,20 +1,20 @@
 class Quote:
-  def __init__(self, 
-    symbol,
-    asset_type,
-    last,
-    change,
-    volume,
-    open_price,
-    close_price,
-    high,
-    low,
-    bid,
-    bid_size,
-    ask,
-    ask_size,
-    week_52_high,
-    week_52_low
+  def __init__(self,
+    symbol: str,
+    asset_type: str,
+    last: float,
+    change: float,
+    volume: int,
+    open_price: float,
+    close_price: float,
+    high: float,
+    low: float,
+    bid: float,
+    bid_size: int,
+    ask: float,
+    ask_size: int,
+    week_52_high: float,
+    week_52_low: float
   ):
     self.symbol = symbol
     self.asset_type = asset_type
@@ -34,22 +34,20 @@ class Quote:
 
   @staticmethod
   def from_tradier_quote(quote):
-    symbol: str = quote.get('symbol')
-    asset_type: str = quote.get('type')
-    last: float = quote.get('last')
-    change: float = quote.get('change')
-    volume: int = quote.get('volume')
-    open_price: float = quote.get('open')
-    close_price: float = quote.get('close')
-    high: float = quote.get('high')
-    low: float = quote.get('low')
-    bid: float = quote.get('bid')
-    bid_size: int = quote.get('bidsize')
-    ask: float = quote.get('ask')
-    ask_size: int = quote.get('asksize')
-    week_52_high: float = quote.get('week_52_high')
-    week_52_low: float = quote.get('week_52_low')
-    return Quote(symbol, asset_type, last, change, volume,
-      open_price, close_price, high, low, bid, bid_size, ask, ask_size,
-      week_52_high, week_52_low)
-
+    return Quote(
+      quote.get('symbol'),
+      quote.get('type'),
+      quote.get('last'),
+      quote.get('change'),
+      quote.get('volume'),
+      quote.get('open'),
+      quote.get('open'),
+      quote.get('close'),
+      quote.get('low'),
+      quote.get('bid'),
+      quote.get('bidsize'),
+      quote.get('ask'),
+      quote.get('asksize'),
+      quote.get('week_52_high'),
+      quote.get('week_52_low')
+    )
