@@ -67,9 +67,9 @@ def run(
   asset_screener: AssetScreener,
   broker: Broker,
   position_sizer: PositionSizer = EqualPositionSizer(),
-  interval: str = '1h',
+  interval: str = '1min',
   start_time: str = '09:30',
-  lookback_days: int = 0,
+  lookback_days: int = 1,
   selection_day: str = 'mon-fri',
   market_data: str = 'tradier',
 ):
@@ -84,7 +84,10 @@ def run(
   scheduler.add_job(select_assets, 'cron', selector_params, day_of_week=selection_day, hour=14, minute=49, timezone='US/Eastern')
 
   trader_params = (alpha_model, broker, position_sizer, getattr(data_bundle, market_data), interval, lookback_days)
-  scheduler.add_job(trade, 'interval', trader_params, minutes=1, start_date=get_start_datetime(start_time), timezone='US/Eastern')
+  if interval == 'daily':
+    scheduler.add_job(trade, 'interval', trader_params, minutes=1440, start_date=get_start_datetime(start_time), timezone='US/Eastern')
+  else:
+    scheduler.add_job(trade, 'interval', trader_params, minutes=int(interval[:-3]), start_date=get_start_datetime(start_time), timezone='US/Eastern')
 
   print(scheduler.get_jobs())
   scheduler.start()

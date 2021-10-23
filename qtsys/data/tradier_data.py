@@ -36,7 +36,7 @@ class TradierData(MarketData):
         bars_dict[symbol] = df
       return bars_dict
     else:
-      params_list = [self._create_data_params(symbol, f'{start} 09:30:00', f'{end} 16:00:00', interval) for symbol in symbols.split(' ')]
+      params_list = [self._create_data_params(symbol, f'{start} 09:30', f'{end} 16:00', interval) for symbol in symbols.split(' ')]
       results = loop.run_until_complete(self.client.async_get_all(loop, '/v1/markets/timesales', params_list))
       bars_dict = dict(results)
       for symbol, bars in bars_dict.items():
