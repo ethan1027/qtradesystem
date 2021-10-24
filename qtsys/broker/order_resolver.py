@@ -38,10 +38,11 @@ class OrderResolver:
       percent = desired_positions.get(symbol)
       if percent:
         side_coefficient = { 'buy': 1, 'sell_short': -2 }
-        desired_quantity = int(balance * percent // quotes[symbol].bid // side_coefficient[order.side])
+        quote = quotes[symbol].high
+        desired_quantity = int(balance * percent // quote // side_coefficient[order.side])
         existing_quantity = existing_positions[symbol].quantity
         quantity_diff = desired_quantity - existing_quantity
-        print(f'{desired_quantity} - {existing_quantity} = {quantity_diff} {symbol} order')
+        logging.info('%s - %s = %s %s order', desired_quantity, existing_quantity, quantity_diff, symbol)
         order.quantity = abs(quantity_diff)
         if order.side == 'buy' and quantity_diff < 0:
           order.side = 'sell'

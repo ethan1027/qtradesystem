@@ -18,10 +18,10 @@ class TradierClient:
       profile = self.get('/v1/user/profile')
       account_number = profile['profile']['account']['account_number']
       status = profile['profile']['account']['status']
-      type = profile['profile']['account']['type']
+      account_type = profile['profile']['account']['type']
       logging.info('account number: %s', account_number)
       logging.info('account status: %s', status)
-      logging.info('account type: %s', type)
+      logging.info('account type: %s', account_type)
       self.account_id = account_number
 
   def get(self, uri, params=None):
@@ -32,9 +32,6 @@ class TradierClient:
 
   def post(self, uri, data):
     response = requests.post(self.url + uri, data, headers=self.headers).json()
-    print(response)
-    # if response.status_code >= 400:
-    #   print(response.status_code, response.text)
     return response 
 
   async def async_get_all(self, loop, uri, params_list):

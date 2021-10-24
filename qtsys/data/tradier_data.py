@@ -64,5 +64,4 @@ class TradierData(MarketData):
     symbols = symbols.replace(' ', ',')
     logging.info('downloading quotes for: %s', symbols)
     quotes = self.client.get('/v1/markets/quotes', { 'symbols': symbols })
-    logging.info(quotes)
     return { quote['symbol']: Quote.from_tradier_quote(quote) for quote in quotes['quotes']['quote'] }

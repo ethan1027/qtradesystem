@@ -69,7 +69,7 @@ def run(
   position_sizer: PositionSizer = EqualPositionSizer(),
   interval: str = '1min',
   start_time: str = '09:30',
-  lookback_days: int = 1,
+  lookback_days: int = 4,
   selection_day: str = 'mon-fri',
   market_data: str = 'tradier',
 ):
