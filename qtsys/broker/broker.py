@@ -1,14 +1,10 @@
-from typing import DefaultDict, Literal
 from abc import ABC, abstractmethod
+from typing import DefaultDict
+from qtsys.broker.typing import AccountType, BalanceType
+from qtsys.broker.order import Order
 from qtsys.broker.position import Position
 
 from qtsys.data.market_data import MarketData
-
-
-SideOfOrder = Literal['buy', 'sell', 'sell_short', 'buy_cover']
-OrderType = Literal['market', 'limit', 'stop', 'stop_limit']
-AccountType = Literal['live', 'paper']
-BalanceType = Literal['cash', 'margin', 'day_margin']
 
 '''
   Abstract Broker for both backtest and live
@@ -36,5 +32,5 @@ class Broker(ABC):
     pass
 
   @abstractmethod
-  def place_order(self, symbol, side: SideOfOrder, quantity, order_type: OrderType, limit, stop):
+  def place_order(self, order: Order):
     pass

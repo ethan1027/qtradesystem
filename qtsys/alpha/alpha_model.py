@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import DefaultDict, Dict, List
 import pandas as pd
-from qtsys.broker.broker import SideOfOrder
+from qtsys.broker.typing import SideOfOrder
 from qtsys.broker.order_resolver import Order
 from qtsys.broker.position import Position
 from qtsys.data.market_data import Quote

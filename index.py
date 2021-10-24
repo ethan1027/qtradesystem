@@ -11,5 +11,5 @@ live_runner.run(
   Screener1(),
   TradierBroker('paper', 'margin', data),
   EqualPositionSizer(),
-  '1m'
+  '1min'
 )

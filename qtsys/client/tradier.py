@@ -32,8 +32,9 @@ class TradierClient:
 
   def post(self, uri, data):
     response = requests.post(self.url + uri, data, headers=self.headers).json()
-    if response.status_code >= 400:
-      print(response.status_code, response.text)
+    print(response)
+    # if response.status_code >= 400:
+    #   print(response.status_code, response.text)
     return response 
 
   async def async_get_all(self, loop, uri, params_list):

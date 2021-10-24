@@ -1,4 +1,4 @@
-from qtsys.broker.broker import OrderType, SideOfOrder
+from qtsys.broker.typing import OrderType, SideOfOrder
 
 
 class Order:
@@ -10,6 +10,5 @@ class Order:
     self.limit = limit
     self.stop = stop
 
-  def to_tuple(self):
-    return (self.symbol, self.side, self.quantity, self.order_type, self.limit, self.stop)
-
+  def __str__(self):
+    return f'{self.quantity} {self.side} {self.order_type} order {self.symbol}'

@@ -1,9 +1,11 @@
 from collections import defaultdict
 from typing import DefaultDict
 import pandas as pd
+from qtsys.broker.order import Order
 from qtsys.broker.position import Position
 from qtsys.client.tradier import TradierClient
-from qtsys.broker.broker import AccountType, BalanceType, Broker, OrderType, SideOfOrder
+from qtsys.broker.broker import Broker
+from qtsys.broker.typing import AccountType, BalanceType
 from qtsys.data.market_data import MarketData
 
 class TradierBroker(Broker):
@@ -19,7 +21,8 @@ class TradierBroker(Broker):
     balances = self.client.get(f'/v1/accounts/{self.account_id}/balances')['balances']
     print(balances)
     if self.balance_type == 'margin':
-      balance = balances['pdt']['stock_buying_power'] + balances['stock_long_value']
+      stock_buying_power = max(balances.get('pdt', {}).get('stock_buying_power', 0), balances.get('margin', {}).get('stock_buying_power', 0))
+      balance = stock_buying_power + balances['stock_long_value']
     else:
       balance = balances['total_equity']
     df = pd.DataFrame(data={'balance': [balance]}, index=[pd.Timestamp.now(tz='US/Eastern')])
@@ -30,7 +33,7 @@ class TradierBroker(Broker):
     positions = self.client.get(f'/v1/accounts/{self.account_id}/positions')
     # df = pd.DataFrame(data={''}, index=[pd.Timestamp.now(tz='US/Eastern')])
     if positions['positions'] == 'null':
-      return defaultdict()
+      return defaultdict(Position)
     positions_dict = { position['symbol']: Position.from_tradier_position(position) for position in positions['positions']['position'] }
     return defaultdict(Position, positions_dict)
 
@@ -43,16 +46,16 @@ class TradierBroker(Broker):
     gainloss = self.client.get(f'/v1/accounts/{self.account_id}/gainloss', params)
     return gainloss['gainloss']['closed_position'][0]
 
-  def place_order(self, symbol, side: SideOfOrder, quantity, order_type: OrderType = 'market', limit = None, stop = None):
+  def place_order(self, order: Order):
     data = {
       'class': 'equity',
-      'symbol': symbol,
-      'side': side,
-      'quantity': str(quantity),
-      'type': order_type,
+      'symbol': order.symbol,
+      'side': order.side,
+      'quantity': str(order.quantity),
+      'type': order.order_type,
       'duration': 'day',
-      'limit': '{:.2f}'.format(limit) if limit else '',
-      'stop': '{:.2f}'.format(stop) if stop else '',
+      'limit': '{:.2f}'.format(order.limit) if order.limit else '',
+      'stop': '{:.2f}'.format(order.stop) if order.stop else '',
     }
     order = self.client.post(f'/v1/accounts/{self.account_id}/orders', data)
     print('placing order:', order)

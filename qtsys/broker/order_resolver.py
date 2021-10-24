@@ -37,18 +37,19 @@ class OrderResolver:
       symbol = order.symbol
       percent = desired_positions.get(symbol)
       if percent:
-        side_coefficient = { 'buy': 1, 'sell_short': 2 }
-        desired_quantity = int(balance * percent // quotes[symbol].last // side_coefficient[order.side])
+        side_coefficient = { 'buy': 1, 'sell_short': -2 }
+        desired_quantity = int(balance * percent // quotes[symbol].bid // side_coefficient[order.side])
         existing_quantity = existing_positions[symbol].quantity
         quantity_diff = desired_quantity - existing_quantity
-        print(f'adjusting {existing_quantity} {symbol} position by {quantity_diff}')
+        print(f'{desired_quantity} - {existing_quantity} = {quantity_diff} {symbol} order')
         order.quantity = abs(quantity_diff)
-        if order.side == 'buy':
+        if order.side == 'buy' and quantity_diff < 0:
           order.side = 'sell'
-        elif order.side == 'sell_short':
+        elif order.side == 'sell_short' and quantity_diff > 0:
           order.side = 'buy_cover'
 
   def place_orders(self, broker: Broker):
     for order in self.orders:
       if order.quantity > 0:
-        broker.place_order(*order.to_tuple())
+        logging.info('placing %s', order)
+        broker.place_order(order)
