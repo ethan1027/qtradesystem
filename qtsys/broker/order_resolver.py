@@ -38,7 +38,7 @@ class OrderResolver:
       percent = desired_positions.get(symbol)
       if percent:
         side_coefficient = { 'buy': 1, 'sell_short': -2 }
-        quote = quotes[symbol].high
+        quote = quotes[symbol].ask
         desired_quantity = int(balance * percent // quote // side_coefficient[order.side])
         existing_quantity = existing_positions[symbol].quantity
         quantity_diff = desired_quantity - existing_quantity

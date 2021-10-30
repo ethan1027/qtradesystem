@@ -4,7 +4,7 @@ import pandas as pd
 from qtsys.broker.typing import SideOfOrder
 from qtsys.broker.order_resolver import Order
 from qtsys.broker.position import Position
-from qtsys.data.market_data import Quote
+from qtsys.data.quote import Quote
 
 class AlphaModel(ABC):
 
@@ -13,7 +13,7 @@ class AlphaModel(ABC):
     returns OrderType
   '''
   @abstractmethod
-  def trade(self, quote, historical_bars, position: Position) -> SideOfOrder:
+  def trade(self, quote: Quote, historical_bars, position: Position) -> SideOfOrder:
     pass
 
   def run_trades(self,
@@ -25,6 +25,8 @@ class AlphaModel(ABC):
     orders: List[Order] = []
     for symbol in symbols.split(' '):
       position = positions[symbol]
-      side = self.trade(quotes[symbol], historical_bars[symbol], position)
+      quote = quotes[symbol]
+      position.quote = quote
+      side = self.trade(quote, historical_bars[symbol], position)
       orders.append(Order(symbol, side, abs(position.quantity)))
     return orders

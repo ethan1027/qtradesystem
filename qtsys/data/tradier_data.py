@@ -56,10 +56,6 @@ class TradierData(MarketData):
   def _create_data_params(self, symbol, start, end, interval):
     return {'symbol': symbol, 'interval': interval, 'start': start, 'end': end }
 
-  def get_historical_bars(self, symbol, current_date):
-    # return self._historical_bars[symbol][:current_date][:-1]
-    pass
-
   def get_quotes(self, symbols: str) -> Dict[str,Quote]:
     symbols = symbols.replace(' ', ',')
     logging.info('downloading quotes for: %s', symbols)

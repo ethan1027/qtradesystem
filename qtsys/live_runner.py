@@ -1,7 +1,6 @@
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from apscheduler.schedulers.blocking import BlockingScheduler
-import pytz
 
 from qtsys.broker.broker import Broker
 from qtsys.alpha.alpha_model import AlphaModel
@@ -12,28 +11,21 @@ from qtsys.sizer.position_sizer import PositionSizer
 from qtsys.sizer.equal_position_sizer import EqualPositionSizer
 from qtsys.data.data_bundle import DataBundle
 from qtsys.client import pystorew
+from qtsys.util.time_util import get_market_today
 
 logging.basicConfig(format="%(asctime)s %(module)s:%(lineno)d %(message)s", datefmt="%Y-%m-%d %H:%M:%S%z", level=logging.DEBUG)
 
-ny_tz = pytz.timezone('US/Eastern')
 
-def trade(
-  alpha_model: AlphaModel,
-  broker: Broker,
-  position_sizer: PositionSizer,
-  data: MarketData,
-  interval: str,
-  lookback_days: int
-):
+
+def trade(alpha_model: AlphaModel, broker: Broker, position_sizer: PositionSizer, data: MarketData, interval: str, lookback_days: int):
   logging.info('start trading job')
-  if True:
-  # if broker.is_market_open():
-    today = datetime.now().astimezone(ny_tz).date()
+  if broker.is_market_open():
+    today = get_market_today()
     order_resolver = OrderResolver()
     positions = broker.get_positions()
 
     # GET ASSETS FROM SCREENER
-    symbols = pystorew.read_selection(broker.get_account_id())[str(today)]['selection'].values[0]
+    symbols = pystorew.read_latest_selection(broker.get_account_id())
     order_resolver.set_closing_orders(symbols, positions)
 
     # RUN ALPHA MODEL
@@ -58,8 +50,7 @@ def select_assets(asset_screener: AssetScreener, broker: Broker, data_bundle: Da
   asset_screener.run_screen(data_bundle, broker.get_account_id())
   logging.info('successfully saved selection')
 
-def get_start_datetime(start_time: str):
-  return f'{date.today()} 00:00:00'
+
 
 
 def run(

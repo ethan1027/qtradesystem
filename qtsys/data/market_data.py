@@ -5,8 +5,6 @@ import pandas as pd
 from qtsys.data.quote import Quote
 
 
-
-
 class MarketData(ABC):
 
   @abstractmethod
@@ -14,11 +12,6 @@ class MarketData(ABC):
     pass
 
   @abstractmethod
-  def get_historical_bars(self, symbols, current_date):
-    pass
-
-  @abstractmethod
   def get_quotes(self, symbols) -> Dict[str, Quote]:
     pass
-
 

@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 from typing import List
 import pystore as ps
+from qtsys.util.time_util import get_market_today
 
 
 ps.set_path('C:/Users/quane/GitProjects/pystoredata')
@@ -30,6 +31,10 @@ def read_selection(broker_id):
   logging.info('successfully retrieved asset selection')
   logging.info(df)
   return df
+
+def read_latest_selection(broker_id):
+  today = get_market_today()
+  return read_selection(broker_id)[str(today)]['selection'].values[0]
 
 def write_order(broker_id, df):
   pass

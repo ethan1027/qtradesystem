@@ -5,4 +5,4 @@ from qtsys.screener.asset_screener import AssetScreener
 
 class Screener1(AssetScreener):
   def screen(self, data: DataBundle) -> List[str]:
-    return ['HIMX', 'DE', 'KLIC', 'VRT', 'NTNX']
+    return ['HIMX', 'DE', 'KLIC', 'VRT', 'NTNX', 'AAPL']

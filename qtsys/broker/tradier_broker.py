@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import DefaultDict
-import pandas as pd
 import logging
+import pandas as pd
 from qtsys.broker.order import Order
 from qtsys.broker.position import Position
 from qtsys.client.tradier import TradierClient
@@ -24,11 +24,15 @@ class TradierBroker(Broker):
       margin_object = balances.get('pdt', {}) or balances.get('margin', {})
       stock_buying_power = margin_object.get('stock_buying_power', 0)
       stock_short_value =  margin_object.get('stock_short_value', 0)
-      balance = stock_buying_power + balances['stock_long_value'] + stock_short_value
+      stock_long_value = balances['stock_long_value']
+      logging.info('stock_buying_power %s', stock_buying_power)
+      logging.info('stock long value %s', stock_long_value)
+      logging.info('stock short value %s', stock_short_value)
+      balance = max(stock_buying_power + stock_long_value + stock_short_value, 0)
     else:
       balance = balances['total_equity']
     df = pd.DataFrame(data={'balance': [balance]}, index=[pd.Timestamp.now(tz='US/Eastern')])
-    logging.info('balance:', balance)
+    logging.info('balance: %s', balance)
     return balance
 
   def get_positions(self) -> DefaultDict[str, Position]:
