@@ -2,22 +2,18 @@ import logging
 from datetime import date, timedelta
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-from qtsys.broker.broker import Broker
-from qtsys.alpha.alpha_model import AlphaModel
-from qtsys.broker.order_resolver import OrderResolver
-from qtsys.data.market_data import MarketData
-from qtsys.screener.asset_screener import AssetScreener
-from qtsys.sizer.position_sizer import PositionSizer
-from qtsys.sizer.equal_position_sizer import EqualPositionSizer
-from qtsys.data.data_bundle import DataBundle
-from qtsys.client import pystorew
-from qtsys.util.time_util import get_market_today
+from qtsys.broker import Broker
+from qtsys.order_resolver import OrderResolver
+from qtsys.data import MarketData
+from qtsys.sample.equal_position_sizer import EvenPortfolioOptimizer
+from research import pystorew
+from qtsys.util import get_market_today, get_start_datetime
 
 logging.basicConfig(format="%(asctime)s %(module)s:%(lineno)d %(message)s", datefmt="%Y-%m-%d %H:%M:%S%z", level=logging.DEBUG)
 
 
 
-def trade(alpha_model: AlphaModel, broker: Broker, position_sizer: PositionSizer, data: MarketData, interval: str, lookback_days: int):
+def trade(broker: Broker, data: MarketData, interval: str, lookback_days: int):
   logging.info('start trading job')
   if broker.is_market_open():
     today = get_market_today()
@@ -32,14 +28,14 @@ def trade(alpha_model: AlphaModel, broker: Broker, position_sizer: PositionSizer
     quotes = data.get_quotes(symbols)
     start = date.today() - timedelta(days=lookback_days)
     logging.info('downloading %s historical bars', interval)
-    historical_bars = data.download_bars(symbols, str(start), str(today), interval)
+    historical_bars = data.get_bars(symbols, str(start), str(today), interval)
     logging.info('successfully downloaded %s historical bars', interval)
     new_orders = alpha_model.run_trades(symbols, quotes, historical_bars, positions)
     order_resolver.append_and_sort_orders(new_orders)
 
     # SIZE POSITIONS
     opening_orders = order_resolver.get_opening_orders()
-    desired_positions = position_sizer.run_sizing(opening_orders)
+    desired_positions = position_sizer.apply(opening_orders)
     order_resolver.quantify_opening_orders(desired_positions, positions, quotes, broker.get_balance())
 
     # PLACE ORDERS
@@ -54,10 +50,10 @@ def select_assets(asset_screener: AssetScreener, broker: Broker, data_bundle: Da
 
 
 def run(
-  alpha_model: AlphaModel,
-  asset_screener: AssetScreener,
+  select_assets: AssetSelectionFn,
+  construct_portfolio: PortfolioConstructionFn,
+  handle_signal: SignalHandler,
   broker: Broker,
-  position_sizer: PositionSizer = EqualPositionSizer(),
   interval: str = '1min',
   start_time: str = '09:30',
   lookback_days: int = 4,

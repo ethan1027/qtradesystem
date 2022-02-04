@@ -1,5 +1,5 @@
 from qtsys.broker.tradier_broker import TradierBroker
-from qtsys.data.tradier_data import TradierData
+from qtsys.tradier import TradierData
 
 def test_backtest_broker():
   # BacktestBroker()
