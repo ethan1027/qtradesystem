@@ -3,23 +3,23 @@ from dataclasses import dataclass
 from typing import Dict
 import pandas as pd
 
-@dataclass
+@dataclass(frozen=True)
 class Quote:
   symbol: str
-  asset_type: str
   open_price: float
-  close_price: float
   high_price: float
   low_price: float
+  close_price: float
   last_price: float
-  change: float
   volume: int
-  bid: float
-  bid_size: int
-  ask: float
-  ask_size: int
-  week_52_high: float
-  week_52_low: float
+  asset_type: str = ''
+  change: float = 0
+  bid: float = 0
+  bid_size: int = 0
+  ask: float = 0
+  ask_size: int = 0
+  week_52_high: float = 0
+  week_52_low: float = 0
 
 
 class MarketData(ABC):
@@ -28,5 +28,5 @@ class MarketData(ABC):
     pass
 
   @abstractmethod
-  def get_quotes(self, symbols) -> Dict[str, Quote]:
+  def get_quotes(self, symbols: str) -> Dict[str, Quote]:
     pass

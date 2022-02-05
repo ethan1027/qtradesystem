@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from datetime import datetime
 from typing import DefaultDict, Literal, Union
+
+from attr import field
 
 from qtsys.data import MarketData, Quote
 
@@ -12,20 +15,23 @@ BalanceType = Literal['cash', 'margin', 'day_margin']
 
 @dataclass
 class Position:
-  cost_basis: float = 0
-  quantity: int = 0
   symbol: str = ''
-  quote: Union[Quote, None] = None
+  open_price: float = 0
+  close_price: float = 0
+  quantity: int = 0
+  open_date: datetime = field(default=None)
+  close_date: datetime = field(default=None)
 
-  def get_profit_percentage(self):
-    if not self.quote:
+  def get_profit_percentage(self, quote: Quote):
+    if not self.quantity:
       return 0
-    return self.get_profit_dollar() / (self.cost_basis * abs(self.quantity))
+    return self.get_profit_dollar(quote) / (self.open_price * abs(self.quantity))
 
-  def get_profit_dollar(self):
-    if not self.quote:
+  def get_profit_dollar(self, quote: Quote):
+    if not self.quantity:
       return 0
-    return (self.quote.last_price - self.cost_basis) * abs(self.quantity)
+    return (quote.last_price - self.open_price) * abs(self.quantity)
+
 
 
 @dataclass
@@ -67,30 +73,3 @@ class Broker(ABC):
   def place_order(self, order: Order):
     pass
 
-
-class BacktestBroker(Broker):
-  def __init__(self, market_data: MarketData, balance_type: BalanceType, start_date, initial_cap: int = 10000):
-    super().__init__(market_data, 'paper', balance_type)
-    self.balance_history = {
-      "date": [start_date],
-      "balance": [initial_cap],
-    }
-
-  def get_account_id(self) -> str:
-      return 'backtest_account'
-
-  def get_balance(self):
-    return self.balance_history["balance"][-1]
-
-  def get_positions(self):
-    pass
-
-  def get_orders(self):
-    pass
-
-  def place_order(self, order: Order):
-    pass
-
-
-  def is_market_open(self):
-      return True

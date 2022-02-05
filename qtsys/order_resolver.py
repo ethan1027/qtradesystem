@@ -1,7 +1,7 @@
 from typing import DefaultDict, Dict, List
 import logging
 
-from qtsys.broker import Broker, Order
+from qtsys.broker import Broker, Order, Position
 from qtsys.data import Quote
 
 

@@ -1,8 +1,8 @@
 import asyncio
+from typing import DefaultDict, Dict
 import requests
 from collections import defaultdict
 import logging
-from typing import DefaultDict, Dict
 from aiohttp import ClientSession
 import pandas as pd
 
@@ -120,7 +120,7 @@ class TradierData(MarketData):
     symbols = symbols.replace(' ', ',')
     logging.info('downloading quotes for: %s', symbols)
     quotes = self.client.get('/v1/markets/quotes', { 'symbols': symbols })
-    return { quote['symbol']: Quote.from_tradier_quote(quote) for quote in quotes['quotes']['quote'] }
+    return { quote['symbol']: transform_tradier_quote(quote) for quote in quotes['quotes']['quote'] }
 
 
 class TradierBroker(Broker):
@@ -149,7 +149,7 @@ class TradierBroker(Broker):
     symbols = [position['symbol'] for position in position_list]
     quotes = self.market_data.get_quotes(symbols)
     positions_dict = { 
-      position['symbol']: transform_tradier_position(position, quotes[position['symbol']]) for position in position_list 
+      position['symbol']: transform_tradier_position(position, quotes[position['symbol']]) for position in position_list
     }
     return defaultdict(Position, positions_dict)
 

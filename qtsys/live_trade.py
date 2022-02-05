@@ -5,8 +5,6 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from qtsys.broker import Broker
 from qtsys.order_resolver import OrderResolver
 from qtsys.data import MarketData
-from qtsys.sample.equal_position_sizer import EvenPortfolioOptimizer
-from research import pystorew
 from qtsys.util import get_market_today, get_start_datetime
 
 logging.basicConfig(format="%(asctime)s %(module)s:%(lineno)d %(message)s", datefmt="%Y-%m-%d %H:%M:%S%z", level=logging.DEBUG)
@@ -21,7 +19,7 @@ def trade(broker: Broker, data: MarketData, interval: str, lookback_days: int):
     positions = broker.get_positions()
 
     # GET ASSETS FROM SCREENER
-    symbols = pystorew.read_latest_selection(broker.get_account_id())
+    # symbols = pystorew.read_latest_selection(broker.get_account_id())
     order_resolver.set_closing_orders(symbols, positions)
 
     # RUN ALPHA MODEL
