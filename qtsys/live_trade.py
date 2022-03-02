@@ -16,7 +16,7 @@ def trade(broker: Broker, data: MarketData, interval: str, lookback_days: int):
   if broker.is_market_open():
     today = get_market_today()
     order_resolver = OrderResolver()
-    positions = broker.get_positions()
+    positions = broker.positions
 
     # GET ASSETS FROM SCREENER
     # symbols = pystorew.read_latest_selection(broker.get_account_id())
@@ -34,14 +34,14 @@ def trade(broker: Broker, data: MarketData, interval: str, lookback_days: int):
     # SIZE POSITIONS
     opening_orders = order_resolver.get_opening_orders()
     desired_positions = position_sizer.apply(opening_orders)
-    order_resolver.quantify_opening_orders(desired_positions, positions, quotes, broker.get_balance())
+    order_resolver.quantify_opening_orders(desired_positions, positions, quotes, broker.balances())
 
     # PLACE ORDERS
     order_resolver.place_orders(broker)
 
 def select_assets(asset_screener: AssetScreener, broker: Broker, data_bundle: DataBundle):
   logging.info('start asset selection job')
-  asset_screener.run_screen(data_bundle, broker.get_account_id())
+  asset_screener.run_screen(data_bundle, broker.account_id())
   logging.info('successfully saved selection')
 
 

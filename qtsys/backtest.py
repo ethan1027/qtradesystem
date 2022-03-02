@@ -1,11 +1,12 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from turtle import position
 from typing import DefaultDict, Dict
 import pandas as pd
 import pandas_market_calendars as mcal
 from qtsys.steps import AssetSelectionFn, PortfolioConstructionFn, SignalHandlerFn, run_asset_selection, run_portfolio_construction
-from qtsys.broker import BalanceType, Broker, Order, Position
+from qtsys.broker import BalanceType, Balances, Broker, Order, Position
 from qtsys.data import MarketData, Quote
 
 
@@ -23,10 +24,10 @@ def run_backtest(
   lookback_days = 30,
   signal_symbols: str = 'SPY',
 ):
-  broker = BacktestBroker(market_data, 'cash', start_dt, initial_capital)
   print('input', start_dt, end_dt)
   nyse = mcal.get_calendar('NYSE')
   schedule = nyse.schedule(start_dt, end_dt)
+  broker = BacktestBroker(market_data, 'cash', schedule[0]['market_open'].astimezone(nyse.tz.zone), initial_capital)
   print(schedule)
   print()
 
@@ -42,7 +43,7 @@ def run_backtest(
     selection_time = (row['market_open']).astimezone(nyse.tz.zone)
     if portfolio_day_counter % portfolio_interval.days == 0:
       portfolio_symbols = run_asset_selection(construct_portfolio, market_data)
-      portfolio_target = run_portfolio_construction(optimize_portfolio, portfolio_symbols, broker.get_positions())
+      portfolio_target = run_portfolio_construction(optimize_portfolio, portfolio_symbols, broker.positions)
       print('selecting', selection_time, portfolio_target)
       accumulative_portfolio.update(portfolio_symbols)
     portfolio_timeline['date'].append(selection_time)
@@ -61,32 +62,81 @@ def run_backtest(
 
 
 class BacktestBroker(Broker):
-  def __init__(self, market_data: MarketData, balance_type: BalanceType, start_date, initial_cap: int = 10000):
+  def __init__(self, market_data: MarketData, balance_type: BalanceType, start_date: datetime, initial_cap: int = 10000, enable_margin: boolean = False):
     super().__init__(market_data, 'paper', balance_type)
-    self.balance = initial_cap
-    self.positions = defaultdict(Position)
-    self.balance_history = {
-      'date': [start_date],
-      'balance': [initial_cap],
-    }
+    margin_buying_power = initial_cap * 2 if enable_margin else 0
+    self._balances_history = [Balances(
+      cash=initial_cap,
+      buying_power=margin_buying_power,
+      long_market_value=0,
+      short_market_value=0,
+      total_position_value=0,
+      equity=initial_cap,
+      daytrading_buying_power=margin_buying_power,
+      timestamp=start_date
+    )]
+    self._positions: Dict[str, Position] = {}
+    self._orders = []
 
-  def get_account_id(self) -> str:
+  def account_id(self) -> str:
       return 'backtest_account'
 
-  def get_balance(self):
-    return self.balance_history["balance"][-1]
+  @property
+  def balances(self):
+    return self._balances_history[-1]
 
-  def get_positions(self) -> DefaultDict[str, Position]:
-    return self.positions
+  @property
+  def positions(self) -> Dict[str, Position]:
+    return self._positions
 
-  def get_orders(self):
-    pass
+  @property
+  def orders(self):
+    return self._orders
 
   def place_order(self, order: Order):
-    pass
+    if order.side == 'buy':
+
+    elif order.side == 'sell':
+      pass
+    elif order.side == 'buy_cover':
+      pass
+    elif order.side == 'sell_short':
+      pass
+
+  def _place_buy_order(self, order: Order):
+    quote = self.market_data.get_quotes(order.symbol)[order.symbol]
+    prev_position = self.positions.get(order.symbol)
+    order_cost_basis = order.quantity + quote.last_price
+    if prev_position:
+      if prev_position.side == 'buy':
+        total_quantity = prev_position.quantity + order.quantity
+        new_position = Position(
+          symbol=order.symbol,
+          quantity=total_quantity,
+          side=order.side,
+          avg_entry_price=(prev_position.cost_basis + order_cost_basis) / total_quantity,
+          current_price=quote.last_price,
+          cost_basis=prev_position.cost_basis + order_cost_basis,
+          unrealized_pl=prev_position.unrealized_pl)
+        self._positions[order.symbol] = new_position
+
+        prev_balances = self._balances_history[-1]
+        new_balances = Balances(
+          cash=initial_cap,
+          buying_power=margin_buying_power,
+          long_market_value=0,
+          short_market_value=0,
+          total_position_value=0,
+          equity=initial_cap,
+          daytrading_buying_power=margin_buying_power,
+          timestamp=start_date
+        )
 
   def is_market_open(self):
       return True
+
+
+
 
 
 @dataclass
@@ -108,15 +158,6 @@ class BacktestMarketData(MarketData):
 
   def _df_to_quote(self, symbol: str) -> Quote:
     row = self.historical_data_dict[symbol][self.sim_end]
-    # TODO
     print('quote', row)
-    return Quote(
-      symbol,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
-    )
+    return Quote(symbol, row['open'], row['high'], row['low'], row['close'], row['close'], row['volume'])
   

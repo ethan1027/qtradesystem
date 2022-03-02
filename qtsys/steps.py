@@ -17,7 +17,7 @@ PortfolioConstructionFn = Callable[[List[str]], Dict[str, float]]
 def run_portfolio_construction(
   func: PortfolioConstructionFn,
   symbols: List[str],
-  positions: DefaultDict[str, Position],
+  positions: Dict[str, Position],
   rebalance: boolean = False) -> Dict[str, float]:
   desired_positions = func(symbols)
   total_allocation = sum(desired_positions.values())
