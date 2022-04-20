@@ -1,8 +1,8 @@
 # Quantitative Trading System
-A Python backtesting & live trading system that is designed to be compatible with multiple brokerages and data feeds.
+A Python backtesting & live trading system designed to work with any trading strategies, brokerages, and data feeds. 📈
 
 
-### Assets:
+#### Assets:
 - Stocks
 - Options
 - Crypto (in development)
@@ -16,6 +16,6 @@ A Python backtesting & live trading system that is designed to be compatible wit
 - Alpaca
 - Yahoo
 
-### Fundamental Data:
+#### Fundamental Data:
 - Tradier
 - IEXCloud
