@@ -7,7 +7,7 @@ Plug in your own brokerage and data provider and start develop your own strategi
 #### Assets:
 - [x] Stocks
 - [x] Options
-- [] Crypto (in development)
+- [ ] Crypto (in development)
 
 #### Brokerages:
 - [x] Tradier
