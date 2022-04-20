@@ -1,7 +1,7 @@
 # Quantitative Trading System
 A Python backtesting & live trading system designed to work with any trading strategies, brokerages, and data feeds. 📈
 
-Plug in your own brokerage and data provider and start develop your own strategies! 
+Plug in your own brokerage and data provider and start develop your own strategies.
 
 
 #### Assets:
