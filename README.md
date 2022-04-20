@@ -3,9 +3,9 @@ A Python backtesting & live trading system designed to work with any trading str
 
 
 #### Assets:
-- Stocks
-- Options
-- Crypto (in development)
+[x] Stocks
+[x] Options
+[x] Crypto (in development)
 
 #### Brokerages:
 - Tradier
