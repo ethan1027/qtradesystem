@@ -1,20 +1,21 @@
 # Quantitative Trading System
 A Python backtesting & live trading system that is designed to be compatible with multiple brokerages and data feeds.
 
-Assets:
+
+### Assets:
 - Stocks
 - Options
 - Crypto (in development)
 
-Brokerages:
+#### Brokerages:
 - Tradier
 - Alpaca
 
-Live Data Feeds:
+### Live Data Feeds:
 - Tradier
 - Alpaca
 - Yahoo
 
-Fundamental Data:
+### Fundamental Data:
 - Tradier
 - IEXCloud
